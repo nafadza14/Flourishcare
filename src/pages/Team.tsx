@@ -20,7 +20,7 @@ export function Team() {
     {
       name: "Achla Himmah M.Psi., Psikolog",
       role: "Psikolog Anak & Remaja",
-      image: "https://media.licdn.com/dms/image/v2/D5603AQH4dTSOe-U4fQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1687060428416?e=2147483647&v=beta&t=b2c_DiyMZBK8ZC1bROwsaUfxWvLyGXxqxljYoK2Wdys",
+      image: "https://i.ibb.co/DPpMtgtw/Whats-App-Image-2026-04-07-at-21-44-20.jpg",
       desc: "Lulusan Magister Profesi Psikologi UGM. Berpengalaman lebih dari 8 tahun dalam menangani kasus autisme, ADHD, dan gangguan kecemasan pada anak. Bersertifikasi dalam Play Therapy.",
       specialties: ["Asesmen Psikologi", "Play Therapy", "Parenting Counseling"]
     },

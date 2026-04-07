@@ -81,7 +81,7 @@ export function Footer() {
               </li>
               <li>
                 <p className="font-medium text-text-primary">WhatsApp</p>
-                <p>+62 812 3456 7890</p>
+                <p>+62 817 5028 099</p>
               </li>
             </ul>
           </div>

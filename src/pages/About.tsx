@@ -40,9 +40,9 @@ export function About() {
               viewport={{ once: true }}
             >
               <img 
-                src="https://images.unsplash.com/photo-1602080858428-57174f9431cf?auto=format&fit=crop&q=80&w=1000" 
+                src="https://i.pinimg.com/736x/f2/aa/4b/f2aa4bee2ea07dc4e0ef94cb2d320820.jpg" 
                 alt="Children playing and learning" 
-                className="rounded-3xl shadow-2xl border-8 border-white object-cover aspect-square"
+                className="rounded-3xl shadow-2xl object-cover aspect-square"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-3xl shadow-xl border border-primary/10 max-w-xs">

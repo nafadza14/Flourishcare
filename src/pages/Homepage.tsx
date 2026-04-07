@@ -85,7 +85,7 @@ export function Homepage() {
                   <Link to="/booking">Booking Sesi Sekarang</Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild className="rounded-xl text-lg border-2">
-                  <a href="https://wa.me/6282246799713" target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
                     Konsultasi Gratis via WhatsApp
                   </a>
                 </Button>
