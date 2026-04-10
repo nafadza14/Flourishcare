@@ -91,21 +91,25 @@ export function Homepage() {
 
         {/* Bento Box Gallery */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-6xl mx-auto h-[400px] md:h-[500px]"
+          className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 max-w-6xl mx-auto h-[400px] md:h-[500px]"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.7 }}
         >
-          <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
-            <img src={bentoImages[0]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
-            <img src={bentoImages[1]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          <div className="hidden md:block col-span-1 row-span-1 min-h-0">
+            <img src={bentoImages[0]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
-          <div className="col-span-1 md:col-span-2 h-full">
+          <div className="hidden md:block col-span-1 row-span-1 min-h-0">
+            <img src={bentoImages[1]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          </div>
+          <div className="col-span-1 md:col-span-2 md:row-span-2 md:col-start-2 md:row-start-1 min-h-0">
             <img src={bentoImages[2]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
-          <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
-            <img src={bentoImages[3]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
-            <img src={bentoImages[4]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          <div className="hidden md:block col-span-1 row-span-1 md:col-start-4 md:row-start-1 min-h-0">
+            <img src={bentoImages[3]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          </div>
+          <div className="hidden md:block col-span-1 row-span-1 md:col-start-4 md:row-start-2 min-h-0">
+            <img src={bentoImages[4]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
         </motion.div>
       </section>
