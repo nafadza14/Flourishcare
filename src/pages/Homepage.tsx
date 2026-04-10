@@ -97,15 +97,15 @@ export function Homepage() {
           transition={{ delay: 0.3, duration: 0.7 }}
         >
           <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
-            <img src={bentoImages[0]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
-            <img src={bentoImages[1]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[0]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[1]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
           <div className="col-span-1 md:col-span-2 h-full">
             <img src={bentoImages[2]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
           <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
-            <img src={bentoImages[3]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
-            <img src={bentoImages[4]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[3]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[4]} alt="Therapy" className="w-full h-[calc(50%-0.5rem)] object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
         </motion.div>
       </section>
