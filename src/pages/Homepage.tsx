@@ -1,9 +1,7 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
-  CheckCircle2, 
   Star, 
   Users, 
   Activity, 
@@ -16,7 +14,8 @@ import {
   Home,
   Building2,
   Stethoscope,
-  ArrowRight
+  ArrowUpRight,
+  CheckCircle2
 } from "lucide-react";
 
 const fadeUp = {
@@ -26,344 +25,398 @@ const fadeUp = {
   transition: { duration: 0.5 }
 };
 
-const staggerContainer = {
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true },
-  transition: { staggerChildren: 0.1 }
-};
-
 export function Homepage() {
-  const heroImages = [
-    "https://iik.ac.id/blog/wp-content/uploads/2023/01/fisioterapi-anak.jpg",
-    "https://taniakidscenter.com/wp-content/uploads/2022/02/terapi-wicara-klinik-tumbuh-kembang-scaled.jpg",
-    "https://akcdn.detik.net.id/visual/2023/11/29/ilustrasi-ciri-anak-adhd-1_11.jpeg?w=720&q=90"
+  const bentoImages = [
+    "https://i.pinimg.com/736x/b1/ea/4d/b1ea4d486af624e510e9fc13791843ae.jpg", // Top Left
+    "https://i.pinimg.com/736x/a0/6b/7f/a06b7f1cb2de748885a65918d11c6a91.jpg", // Bottom Left
+    "https://i.pinimg.com/736x/3b/d2/cb/3bd2cb81b8e012b588d72e1250d893bb.jpg", // Center Large
+    "https://i.pinimg.com/1200x/d4/d0/a2/d4d0a26da2bfe6ee86f485332d7cbaaf.jpg", // Top Right
+    "https://i.pinimg.com/736x/5e/73/8f/5e738f21883a045057d345c8b5428e08.jpg" // Bottom Right
   ];
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
-    }, 4000); // Change image every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [heroImages.length]);
-
   return (
-    <div className="flex flex-col w-full overflow-hidden">
+    <div className="flex flex-col w-full overflow-hidden bg-background">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 lg:pt-32 lg:pb-40 overflow-hidden bg-background">
-        {/* Organic Blob Backgrounds */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-          <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-secondary/10 blur-3xl opacity-60" />
-          <div className="absolute top-[40%] -left-[10%] w-[50%] h-[50%] rounded-full bg-bluebell/20 blur-3xl opacity-60" />
-        </div>
+      <section className="pt-20 pb-16 lg:pt-28 lg:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
+        <motion.h1 
+          className="text-4xl sm:text-5xl lg:text-7xl font-heading font-extrabold text-text-primary leading-[1.1] tracking-tight mb-6 max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          Setiap Anak Berhak <span className="text-primary">Tumbuh Sepenuhnya</span>
+        </motion.h1>
+        
+        <motion.p 
+          className="text-lg sm:text-xl text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          FlourishCare menghadirkan terapi tumbuh kembang profesional di rumah tumbuh kembang kami, atau langsung di rumahmu. Dipandu psikolog berpengalaman, dipantau setiap langkahnya.
+        </motion.p>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            <motion.div 
-              className="max-w-2xl"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-text-primary leading-tight mb-6">
-                Setiap Anak Berhak <span className="text-primary relative">
-                  Tumbuh Sepenuhnya
-                  <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow opacity-70" viewBox="0 0 100 10" preserveAspectRatio="none">
-                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
-                  </svg>
-                </span>
-              </h1>
-              <p className="text-lg sm:text-xl text-text-secondary mb-8 leading-relaxed font-sans">
-                FlourishCare menghadirkan terapi tumbuh kembang profesional di rumah tumbuh kembang kami, atau langsung di rumahmu. Dipandu psikolog berpengalaman, dipantau setiap langkahnya.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                <Button size="lg" asChild className="rounded-xl text-lg shadow-lg shadow-primary/20">
-                  <Link to="/booking">Booking Sesi Sekarang</Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild className="rounded-xl text-lg border-2">
-                  <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
-                    Konsultasi Gratis via WhatsApp
-                  </a>
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  "Terapis Berlisensi & Berpengalaman", 
-                  "Home Visit Tersedia", 
-                  "Laporan Progres Digital", 
-                  "Evaluasi Berkala Setiap 16 Sesi"
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-text-primary font-medium">
-                    <CheckCircle2 className="text-secondary w-5 h-5 flex-shrink-0" />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="relative"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="relative rounded-3xl overflow-hidden aspect-square lg:aspect-[4/3] bg-bluebell/10 shadow-2xl">
-                <AnimatePresence mode="wait">
-                  <motion.img 
-                    key={currentImageIndex}
-                    src={heroImages[currentImageIndex]}
-                    alt={`Therapy image ${currentImageIndex + 1}`}
-                    className="object-cover w-full h-full absolute top-0 left-0"
-                    referrerPolicy="no-referrer"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8 }}
-                  />
-                </AnimatePresence>
-                
-                {/* Carousel Indicators */}
-                <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                  {heroImages.map((_, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-primary w-6' : 'bg-white/60 hover:bg-white'}`}
-                      aria-label={`Go to slide ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-
-                {/* Floating Badge */}
-                <div className="absolute bottom-6 left-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4 z-10">
-                  <div className="w-12 h-12 bg-yellow/20 rounded-full flex items-center justify-center text-yellow">
-                    <Star className="w-6 h-6 fill-current" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-text-primary">4.9/5 Rating</p>
-                    <p className="text-sm text-text-secondary">Dari 50+ Keluarga</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+        <motion.div 
+          className="flex flex-col items-center gap-6 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-primary/10">
+            <div className="flex -space-x-3">
+              <img src="https://i.pravatar.cc/100?img=1" alt="Parent" className="w-8 h-8 rounded-full border-2 border-white" />
+              <img src="https://i.pravatar.cc/100?img=2" alt="Parent" className="w-8 h-8 rounded-full border-2 border-white" />
+              <img src="https://i.pravatar.cc/100?img=3" alt="Parent" className="w-8 h-8 rounded-full border-2 border-white" />
+            </div>
+            <div className="flex items-center gap-1 text-yellow">
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+            </div>
+            <span className="text-sm font-bold text-text-primary">4.9/5 Rating Dari 50+ Keluarga</span>
           </div>
-        </div>
-      </section>
 
-      {/* Social Proof Bar */}
-      <section className="py-10 bg-white border-y border-primary/10">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-            {[
-              { icon: Users, text: "50+ Keluarga Telah Bersama Kami" },
-              { icon: Activity, text: "5 Jenis Terapi Komprehensif" },
-              { icon: HeartHandshake, text: "98% Orang Tua Puas dengan Progres" },
-              { icon: MapPin, text: "Home Visit Radius 15 km" },
-              { icon: Star, text: "Rating: ⭐⭐⭐⭐⭐ 4.9/5" }
-            ].map((item, i) => (
-              <motion.div 
-                key={i} 
-                className="flex items-center gap-3"
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                  <item.icon size={20} />
-                </div>
-                <span className="font-heading font-bold text-text-primary text-sm md:text-base">{item.text}</span>
-              </motion.div>
-            ))}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button size="lg" asChild className="rounded-full text-lg px-8 py-6 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+              <Link to="/booking">Booking Sesi Sekarang</Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild className="rounded-full text-lg px-8 py-6 border-2 hover:bg-primary/5">
+              <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
+                Konsultasi Gratis via WhatsApp
+              </a>
+            </Button>
           </div>
-        </div>
-      </section>
+        </motion.div>
 
-      {/* Problem Section */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <motion.div 
-            className="text-center max-w-2xl mx-auto mb-16"
-            {...fadeUp}
-          >
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-text-primary mb-4">
-              Apakah Si Kecil Mengalami Ini?
-            </h2>
-            <p className="text-text-secondary text-lg">
-              Setiap anak memiliki tantangannya sendiri. Kami siap membantu mereka melewati fase ini dengan pendekatan yang tepat.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="whileInView"
-          >
-            {[
-              { title: "Keterlambatan Bicara", desc: "Sulit mengekspresikan diri, kosakata terbatas", icon: MessageSquare, color: "bg-bluebell/20 text-bluebell" },
-              { title: "ADHD & Hiperaktivitas", desc: "Sulit fokus, impulsif, tidak bisa diam", icon: Activity, color: "bg-orange/20 text-orange" },
-              { title: "Autisme (ASD)", desc: "Hambatan komunikasi sosial, perilaku repetitif", icon: Brain, color: "bg-primary/20 text-primary" },
-              { title: "Kesulitan Belajar", desc: "Disleksia, disgrafia, berhitung terlambat", icon: GraduationCap, color: "bg-yellow/20 text-yellow" },
-              { title: "Gangguan Motorik", desc: "Koordinasi tubuh, postur, keseimbangan", icon: Activity, color: "bg-secondary/20 text-secondary" },
-              { title: "Kecemasan & Emosi", desc: "Tantrum berlebihan, fobia, menarik diri", icon: Smile, color: "bg-red/20 text-red" }
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
-                variants={fadeUp}
-                className="bg-white p-6 rounded-2xl shadow-sm border border-primary/5 hover:shadow-md transition-shadow flex items-start gap-4"
-              >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                  <item.icon size={28} />
-                </div>
-                <div>
-                  <h3 className="font-heading font-bold text-lg text-text-primary mb-1">{item.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Services Pillar */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <motion.div 
-            className="text-center max-w-2xl mx-auto mb-16"
-            {...fadeUp}
-          >
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-text-primary mb-4">
-              Layanan Fleksibel Sesuai Kebutuhan
-            </h2>
-            <p className="text-text-secondary text-lg">
-              Pilih metode terapi yang paling nyaman untuk anak dan keluarga Anda.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Terapi On Site",
-                desc: "Ruang terapi ramah anak, 5 jenis terapi komprehensif untuk stimulasi optimal.",
-                icon: Building2,
-                color: "bg-bluebell",
-                textColor: "text-bluebell"
-              },
-              {
-                title: "Home Visit",
-                desc: "Terapis datang ke rumah, radius 15 km. Nyaman, praktis, dan anak belajar di lingkungan sehari-harinya.",
-                icon: Home,
-                color: "bg-secondary",
-                textColor: "text-secondary"
-              },
-              {
-                title: "Konsultasi Psikolog",
-                desc: "Layanan konsultasi, tes IQ, dan evaluasi perkembangan untuk dukungan emosional dan perilaku.",
-                icon: Stethoscope,
-                color: "bg-primary",
-                textColor: "text-primary"
-              }
-            ].map((service, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
-                className="group relative bg-background rounded-3xl p-8 overflow-hidden hover:shadow-xl transition-all duration-300 border border-primary/5"
-              >
-                <div className={`absolute top-0 right-0 w-32 h-32 ${service.color} opacity-10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110`} />
-                <div className={`w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-6 ${service.textColor}`}>
-                  <service.icon size={32} />
-                </div>
-                <h3 className="font-heading font-bold text-2xl text-text-primary mb-4">{service.title}</h3>
-                <p className="text-text-secondary leading-relaxed mb-6">{service.desc}</p>
-                <Link to="/booking" className={`inline-flex items-center font-bold ${service.textColor} hover:opacity-80 transition-opacity`}>
-                  Pelajari Lebih Lanjut <ArrowRight size={16} className="ml-2" />
-                </Link>
-              </motion.div>
-            ))}
+        {/* Bento Box Gallery */}
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-6xl mx-auto h-[400px] md:h-[500px]"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.7 }}
+        >
+          <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
+            <img src={bentoImages[0]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[1]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
           </div>
-        </div>
+          <div className="col-span-1 md:col-span-2 h-full">
+            <img src={bentoImages[2]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          </div>
+          <div className="hidden md:flex flex-col gap-4 col-span-1 h-full">
+            <img src={bentoImages[3]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
+            <img src={bentoImages[4]} alt="Therapy" className="w-full h-1/2 object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          </div>
+        </motion.div>
       </section>
 
-      {/* How it Works */}
-      <section className="py-24 bg-background overflow-hidden">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <motion.div 
-            className="text-center max-w-2xl mx-auto mb-16"
-            {...fadeUp}
-          >
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-text-primary mb-4">
-              Bagaimana FlourishCare Bekerja?
-            </h2>
-            <p className="text-text-secondary text-lg">
-              Proses yang transparan dan terstruktur untuk memastikan hasil terbaik.
-            </p>
-          </motion.div>
+      {/* Core Values / Social Proof Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Nilai & Keunggulan Kami
+          </h2>
+          <p className="text-text-secondary text-lg max-w-lg">
+            FlourishCare didedikasikan untuk memberikan layanan terapi terbaik dengan pendekatan yang berpusat pada anak dan keluarga.
+          </p>
+        </div>
 
-          <div className="relative">
-            {/* Connecting Line */}
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-primary/20 -translate-y-1/2 z-0" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Block 1 */}
+          <div className="bg-white rounded-[2rem] p-6 flex flex-col sm:flex-row gap-6 relative shadow-sm border border-primary/10">
+            {/* Top Right Arrow */}
+            <div className="absolute -right-3 -top-3 bg-white p-3 rounded-2xl shadow-md border border-primary/10 text-primary z-10">
+              <ArrowUpRight size={24} />
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 relative z-10">
-              {[
-                "Konsultasi Awal",
-                "Asesmen",
-                "Rencana Terapi",
-                "Sesi Reguler",
-                "Evaluasi"
-              ].map((step, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15 }}
-                  className="flex flex-col items-center text-center"
-                >
-                  <div className="w-16 h-16 rounded-full bg-white border-4 border-primary text-primary font-heading font-bold text-2xl flex items-center justify-center shadow-lg mb-4 relative">
-                    {i + 1}
-                  </div>
-                  <h3 className="font-heading font-bold text-lg text-text-primary">{step}</h3>
-                </motion.div>
-              ))}
+            {/* Left Col */}
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="p-2">
+                <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">50+ Keluarga Telah Bersama Kami</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  Mempercayakan tumbuh kembang anak dengan Rating: ⭐⭐⭐⭐⭐ 4.9/5.
+                </p>
+              </div>
+              <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=800" alt="Keluarga" className="w-full h-48 object-cover rounded-2xl mt-auto" referrerPolicy="no-referrer" />
+            </div>
+
+            {/* Right Col */}
+            <div className="flex-1 flex flex-col gap-4 relative">
+              <img src="https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=800" alt="Terapi" className="w-full h-48 object-cover rounded-2xl" referrerPolicy="no-referrer" />
+              <div className="p-2 mt-auto">
+                <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">5 Jenis Terapi Komprehensif</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  Layanan yang disesuaikan dengan kebutuhan spesifik setiap anak untuk hasil optimal.
+                </p>
+              </div>
+              {/* Bottom Left Arrow */}
+              <div className="absolute -left-10 bottom-4 bg-white p-3 rounded-2xl shadow-md border border-primary/10 text-primary z-10 hidden sm:block">
+                <ArrowUpRight size={24} />
+              </div>
+            </div>
+          </div>
+
+          {/* Block 2 */}
+          <div className="bg-white rounded-[2rem] p-6 flex flex-col sm:flex-row gap-6 relative shadow-sm border border-primary/10">
+            {/* Top Right Arrow */}
+            <div className="absolute -right-3 -top-3 bg-white p-3 rounded-2xl shadow-md border border-primary/10 text-primary z-10">
+              <ArrowUpRight size={24} />
+            </div>
+            
+            {/* Left Col */}
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="p-2">
+                <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">98% Orang Tua Puas dengan Progres</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  Melihat perkembangan positif anak setelah mengikuti sesi terapi secara rutin.
+                </p>
+              </div>
+              <img src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&q=80&w=800" alt="Kepuasan" className="w-full h-48 object-cover rounded-2xl mt-auto" referrerPolicy="no-referrer" />
+            </div>
+
+            {/* Right Col */}
+            <div className="flex-1 flex flex-col gap-4 relative">
+              <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800" alt="Home Visit" className="w-full h-48 object-cover rounded-2xl" referrerPolicy="no-referrer" />
+              <div className="p-2 mt-auto">
+                <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">Home Visit Radius 15 km</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">
+                  Layanan terapis datang ke rumah untuk kenyamanan Anda dan si kecil.
+                </p>
+              </div>
+              {/* Bottom Left Arrow */}
+              <div className="absolute -left-10 bottom-4 bg-white p-3 rounded-2xl shadow-md border border-primary/10 text-primary z-10 hidden sm:block">
+                <ArrowUpRight size={24} />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <motion.div 
-            className="bg-primary rounded-3xl p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-primary/20"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            {/* Decorative circles */}
-            <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-2xl" />
-            <div className="absolute bottom-0 right-0 w-64 h-64 bg-secondary/40 rounded-full translate-x-1/3 translate-y-1/3 blur-2xl" />
-            
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6 leading-tight">
-                Mulai Perjalanan Tumbuh Kembang Anak Hari Ini
-              </h2>
-              <p className="text-white/90 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-                Jangan tunda perkembangan optimal anak Anda. Jadwalkan sesi pertama sekarang dan lihat perubahannya.
-              </p>
-              <Button size="lg" variant="secondary" asChild className="rounded-xl text-lg text-primary bg-white hover:bg-white/90 shadow-xl px-10 h-14">
+      {/* Problem Section -> Our Story Layout */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Apakah Si Kecil Mengalami Ini?
+          </h2>
+          <p className="text-text-secondary text-lg max-w-md">
+            Setiap anak memiliki tantangannya sendiri. Kami siap membantu mereka melewati fase ini dengan pendekatan yang tepat.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { title: "Keterlambatan Bicara", desc: "Sulit mengekspresikan diri, kosakata terbatas", icon: MessageSquare, color: "bg-bluebell/20 text-bluebell" },
+            { title: "ADHD & Hiperaktivitas", desc: "Sulit fokus, impulsif, tidak bisa diam", icon: Activity, color: "bg-orange/20 text-orange" },
+            { title: "Autisme (ASD)", desc: "Hambatan komunikasi sosial, perilaku repetitif", icon: Brain, color: "bg-primary/20 text-primary" },
+            { title: "Kesulitan Belajar", desc: "Disleksia, disgrafia, berhitung terlambat", icon: GraduationCap, color: "bg-yellow/20 text-yellow" },
+            { title: "Gangguan Motorik", desc: "Koordinasi tubuh, postur, keseimbangan", icon: Activity, color: "bg-secondary/20 text-secondary" },
+            { title: "Kecemasan & Emosi", desc: "Tantrum berlebihan, fobia, menarik diri", icon: Smile, color: "bg-red/20 text-red" }
+          ].map((item, i) => (
+            <motion.div 
+              key={i}
+              {...fadeUp}
+              className="bg-white p-8 rounded-[2rem] shadow-sm border border-primary/10 hover:shadow-md transition-all group relative flex flex-col"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${item.color}`}>
+                  <item.icon size={32} />
+                </div>
+                <div className="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                  <ArrowUpRight size={20} />
+                </div>
+              </div>
+              <h3 className="font-heading font-bold text-2xl text-text-primary mb-3">{item.title}</h3>
+              <p className="text-text-secondary leading-relaxed">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services Section -> Our Programs Layout */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full bg-white/50 rounded-[3rem] my-10">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Layanan Fleksibel Sesuai Kebutuhan
+          </h2>
+          <p className="text-text-secondary text-lg max-w-md">
+            Pilih metode terapi yang paling nyaman untuk anak dan keluarga Anda.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Terapi On Site",
+              desc: "Ruang terapi ramah anak, 5 jenis terapi komprehensif untuk stimulasi optimal.",
+              img: "https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=800",
+              features: ["Ruang terapi tematik", "Alat sensori lengkap", "Protokol kebersihan"]
+            },
+            {
+              title: "Home Visit",
+              desc: "Terapis datang ke rumah, radius 15 km. Nyaman, praktis, dan anak belajar di lingkungan sehari-harinya.",
+              img: "https://images.unsplash.com/photo-1602080858428-57174f9431cf?auto=format&fit=crop&q=80&w=800",
+              features: ["Terapis datang ke rumah", "Jadwal fleksibel", "Lingkungan familiar"]
+            },
+            {
+              title: "Konsultasi Psikolog",
+              desc: "Layanan konsultasi, tes IQ, dan evaluasi perkembangan untuk dukungan emosional dan perilaku.",
+              img: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800",
+              features: ["Tes IQ & Asesmen", "Konseling orang tua", "Dukungan emosional"]
+            }
+          ].map((service, i) => (
+            <motion.div
+              key={i}
+              {...fadeUp}
+              className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-primary/10 flex flex-col"
+            >
+              <div className="h-48 relative">
+                <img src={service.img} alt={service.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <div className="absolute top-4 right-4 bg-white px-4 py-1.5 rounded-full text-sm font-bold text-primary shadow-sm">
+                  Layanan
+                </div>
+              </div>
+              <div className="p-8 flex flex-col flex-grow">
+                <h3 className="font-heading font-bold text-2xl text-text-primary mb-3">{service.title}</h3>
+                <p className="text-text-secondary mb-6">{service.desc}</p>
+                <ul className="space-y-3 mb-8 flex-grow">
+                  {service.features.map((feat, idx) => (
+                    <li key={idx} className="flex items-center gap-3 text-text-primary font-medium text-sm">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-end">
+                  <Link to="/booking" className="text-primary font-bold hover:text-primary-hover transition-colors">
+                    Pelajari Lebih Lanjut
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it Works -> Why Choose Us Layout */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Bagaimana FlourishCare Bekerja?
+          </h2>
+          <p className="text-text-secondary text-lg max-w-md">
+            Proses yang transparan dan terstruktur untuk memastikan hasil terbaik.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[
+            "Konsultasi Awal",
+            "Asesmen",
+            "Rencana Terapi",
+            "Sesi Reguler",
+            "Evaluasi"
+          ].map((step, i) => (
+            <motion.div
+              key={i}
+              {...fadeUp}
+              className="bg-white p-6 rounded-[2rem] shadow-sm border border-primary/10 flex flex-col items-center text-center"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6">
+                <span className="font-heading font-bold text-2xl">{i + 1}</span>
+              </div>
+              <h3 className="font-heading font-bold text-xl text-text-primary">{step}</h3>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Galeri
+          </h2>
+          <p className="text-text-secondary text-lg max-w-md">
+            Intip suasana ruang terapi kami, di mana setiap hari dipenuhi dengan rasa ingin tahu, kreativitas, dan keceriaan anak-anak.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {[
+            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1602080858428-57174f9431cf?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1471286174890-9c11241eb435?auto=format&fit=crop&q=80&w=600",
+            "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=600"
+          ].map((img, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="aspect-[4/3] rounded-3xl overflow-hidden shadow-sm"
+            >
+              <img src={img} alt={`Gallery ${i+1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer" />
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Button size="lg" className="rounded-full text-lg px-10 py-6 shadow-lg shadow-primary/20">
+            Full Gallery
+          </Button>
+        </div>
+      </section>
+
+      {/* CTA Section -> Contact Layout */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full mb-20">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
+            Mulai Perjalanan Tumbuh Kembang Anak Hari Ini
+          </h2>
+          <p className="text-text-secondary text-lg max-w-md">
+            Jangan tunda perkembangan optimal anak Anda. Jadwalkan sesi pertama sekarang dan lihat perubahannya.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-sm border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-xl">
+            <h3 className="text-2xl font-bold text-text-primary mb-4">Siap untuk memulai?</h3>
+            <p className="text-text-secondary mb-8">
+              Tim kami siap membantu Anda menemukan layanan yang paling tepat untuk kebutuhan si kecil.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" asChild className="rounded-full text-lg px-8 py-6 shadow-lg shadow-primary/20">
                 <Link to="/booking">Booking Sekarang</Link>
               </Button>
+              <Button size="lg" variant="outline" asChild className="rounded-full text-lg px-8 py-6 border-2">
+                <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
+                  Hubungi Kami
+                </a>
+              </Button>
             </div>
-          </motion.div>
+          </div>
+          <div className="w-full md:w-1/3 bg-background rounded-3xl p-8">
+            <ul className="space-y-6">
+              {[
+                "Terapis Berlisensi & Berpengalaman", 
+                "Home Visit Tersedia", 
+                "Laporan Progres Digital", 
+                "Evaluasi Berkala Setiap 16 Sesi"
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-4 text-text-primary font-medium">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
     </div>

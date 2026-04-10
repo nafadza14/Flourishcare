@@ -11,6 +11,8 @@ import { Pricing } from "./pages/Pricing";
 import { Services } from "./pages/Services";
 import { Team } from "./pages/Team";
 import { About } from "./pages/About";
+import { Login } from "./pages/Login";
+import { Dashboard } from "./pages/Dashboard";
 
 export default function App() {
   return (
@@ -24,6 +26,8 @@ export default function App() {
           <Route path="team" element={<Team />} />
           <Route path="about" element={<About />} />
         </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );

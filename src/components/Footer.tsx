@@ -8,12 +8,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                F
-              </div>
-              <span className="font-heading font-bold text-xl text-text-primary">
-                Flourish<span className="text-primary">Care</span>
-              </span>
+              <img 
+                src="https://i.pinimg.com/736x/e2/11/9a/e2119a970264b1116bf8c76318d1265a.jpg" 
+                alt="FlourishCare Logo" 
+                className="h-20 w-auto object-contain mix-blend-multiply" 
+                referrerPolicy="no-referrer" 
+              />
             </Link>
             <p className="text-text-secondary text-sm leading-relaxed">
               Tumbuh Bersama, Flourish Sepenuhnya. Menghadirkan terapi tumbuh kembang profesional untuk anak Anda.

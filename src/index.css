@@ -6,16 +6,16 @@
   --font-heading: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-accent: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
 
-  --color-primary: #1BA896;
-  --color-primary-hover: #158A7A;
-  --color-secondary: #5ECFBF;
+  --color-primary: #F29935;
+  --color-primary-hover: #D8852B;
+  --color-secondary: #F5BB3E;
   --color-bluebell: #89C4E1;
-  --color-orange: #F5921E;
-  --color-yellow: #F5D120;
+  --color-orange: #F29935;
+  --color-yellow: #F5BB3E;
   --color-red: #E8212A;
-  --color-background: #F6FBF9;
-  --color-text-primary: #5A7A71;
-  --color-text-secondary: #5A7A71;
+  --color-background: #FFFDE9;
+  --color-text-primary: #7A4C3D;
+  --color-text-secondary: #9A6C5D;
 }
 
 @layer base {
@@ -79,4 +79,10 @@ button, .btn, [role="button"] {
   font-size: 15px !important;
   font-weight: 600 !important;
   text-transform: none !important;
+}
+
+@keyframes scan {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
 }
