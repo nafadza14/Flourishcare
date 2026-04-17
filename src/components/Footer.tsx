@@ -58,7 +58,7 @@ export function Footer() {
           <div>
             <h3 className="font-heading font-bold text-lg mb-6">Layanan</h3>
             <ul className="space-y-3">
-              {["Terapi On-Site", "Home Visit", "Konsultasi Psikolog", "Evaluasi Berkala", "Laporan Digital"].map((item) => (
+              {["Terapi On-Site", "Terapi Home Visit", "Konsultasi Psikolog", "Psikotes & Asesmen"].map((item) => (
                 <li key={item}>
                   <Link to="#" className="text-text-secondary hover:text-primary transition-colors text-sm">
                     {item}

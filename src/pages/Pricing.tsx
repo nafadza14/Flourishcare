@@ -48,11 +48,8 @@ export function Pricing() {
                     </thead>
                     <tbody className="bg-white">
                       {[
-                        { name: "Sensori Integrasi (SI)", p4: "Rp 560.000", p8: "Rp 1.120.000", p12: "Rp 1.680.000", p16: "Rp 2.240.000" },
-                        { name: "Terapi Wicara (TW)", p4: "Rp 560.000", p8: "Rp 1.120.000", p12: "Rp 1.680.000", p16: "Rp 2.240.000" },
-                        { name: "Terapi Okupasi (OT)", p4: "Rp 560.000", p8: "Rp 1.120.000", p12: "Rp 1.680.000", p16: "Rp 2.240.000" },
-                        { name: "Fisioterapi (FT)", p4: "Rp 560.000", p8: "Rp 1.120.000", p12: "Rp 1.680.000", p16: "Rp 2.240.000" },
-                        { name: "Behavioral Therapy (BT)", p4: "Rp 760.000", p8: "Rp 1.520.000", p12: "Rp 2.280.000", p16: "Rp 3.040.000" },
+                        { name: "Sensori Integrasi (SI), Terapi Wicara (TW), Okupasi Terapi (OT)", p4: "Rp 720.000", p8: "Rp 1.425.000", p12: "Rp 2.130.000", p16: "Rp 2.835.000" },
+                        { name: "Behavioral Therapy (BT)", p4: "Rp 920.000", p8: "Rp 1.825.000", p12: "Rp 2.730.000", p16: "Rp 3.635.000" },
                       ].map((row, i) => (
                         <tr key={i} className="border-b border-primary/5 hover:bg-background/50 transition-colors">
                           <td className="p-4 font-medium text-text-primary">{row.name}</td>
@@ -83,8 +80,8 @@ export function Pricing() {
                     </thead>
                     <tbody className="bg-white">
                       {[
-                        { name: "SI / TW / OT / FT", p4: "Rp 600.000", p8: "Rp 1.200.000", p12: "Rp 1.800.000", p16: "Rp 2.400.000" },
-                        { name: "Behavioral Therapy (BT)", p4: "Rp 800.000", p8: "Rp 1.600.000", p12: "Rp 2.400.000", p16: "Rp 3.200.000" },
+                        { name: "SI / TW / OT", p4: "Rp 760.000", p8: "Rp 1.510.000", p12: "Rp 2.250.000", p16: "Rp 2.980.000" },
+                        { name: "Behavioral Therapy (BT)", p4: "Rp 960.000", p8: "Rp 1.910.000", p12: "Rp 2.850.000", p16: "Rp 3.780.000" },
                       ].map((row, i) => (
                         <tr key={i} className="border-b border-primary/5 hover:bg-background/50 transition-colors">
                           <td className="p-4 font-medium text-text-primary">{row.name}</td>
@@ -124,8 +121,7 @@ export function Pricing() {
                     </thead>
                     <tbody className="bg-white">
                       {[
-                        { name: "SI / TW / OT / FT", p4: "Rp 1.120.000", p8: "Rp 2.240.000", p12: "Rp 3.360.000", p16: "Rp 4.480.000" },
-                        { name: "Behavioral Therapy (BT)", p4: "Rp 1.520.000", p8: "Rp 3.040.000", p12: "Rp 4.560.000", p16: "Rp 6.080.000" },
+                        { name: "SI / TW / OT", p4: "Rp 1.440.000", p8: "Rp 2.880.000", p12: "Rp 4.320.000", p16: "Rp 5.760.000" },
                       ].map((row, i) => (
                         <tr key={i} className="border-b border-primary/5 hover:bg-background/50 transition-colors">
                           <td className="p-4 font-medium text-text-primary">{row.name}</td>
@@ -156,8 +152,7 @@ export function Pricing() {
                     </thead>
                     <tbody className="bg-white">
                       {[
-                        { name: "SI / TW / OT / FT", p4: "Rp 1.200.000", p8: "Rp 2.400.000", p12: "Rp 3.600.000", p16: "Rp 4.800.000" },
-                        { name: "Behavioral Therapy (BT)", p4: "Rp 1.600.000", p8: "Rp 3.200.000", p12: "Rp 4.800.000", p16: "Rp 6.400.000" },
+                        { name: "SI / TW / OT", p4: "Rp 1.520.000", p8: "Rp 3.040.000", p12: "Rp 4.560.000", p16: "Rp 6.080.000" },
                       ].map((row, i) => (
                         <tr key={i} className="border-b border-primary/5 hover:bg-background/50 transition-colors">
                           <td className="p-4 font-medium text-text-primary">{row.name}</td>
@@ -191,8 +186,8 @@ export function Pricing() {
                 </thead>
                 <tbody className="bg-white">
                   {[
-                    { name: "Pendaftaran (sekali bayar)", onsite: "Rp 100.000", home: "Rp 100.000" },
-                    { name: "Konsultasi Psikolog", onsite: "Rp 250.000", home: "Rp 500.000" },
+                    { name: "Pendaftaran", onsite: "Rp 0 (Free)", home: "Rp 0 (Free)" },
+                    { name: "Konsultasi Psikolog", onsite: "Rp 300.000", home: "Rp 600.000" },
                     { name: "Evaluasi Kematangan Perkembangan", onsite: "Rp 300.000", home: "Rp 600.000" },
                     { name: "Tes IQ", onsite: "Rp 350.000", home: "Rp 700.000" },
                     { name: "Tes Kesiapan Sekolah", onsite: "Rp 350.000", home: "Rp 700.000" },

@@ -15,7 +15,8 @@ import {
   Building2,
   Stethoscope,
   ArrowUpRight,
-  CheckCircle2
+  CheckCircle2,
+  Check
 } from "lucide-react";
 
 const fadeUp = {
@@ -37,7 +38,7 @@ export function Homepage() {
   return (
     <div className="flex flex-col w-full overflow-hidden bg-background">
       {/* Hero Section */}
-      <section className="pt-20 pb-16 lg:pt-28 lg:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
+      <section className="pt-8 pb-16 lg:pt-16 lg:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
         <motion.h1 
           className="text-4xl sm:text-5xl lg:text-7xl font-heading font-extrabold text-text-primary leading-[1.1] tracking-tight mb-6 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -47,13 +48,34 @@ export function Homepage() {
         </motion.h1>
         
         <motion.p 
-          className="text-lg sm:text-xl text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed"
+          className="text-lg sm:text-xl text-text-secondary mb-6 max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          FlourishCare menghadirkan terapi tumbuh kembang profesional di rumah tumbuh kembang kami, atau langsung di rumahmu. Dipandu psikolog berpengalaman, dipantau setiap langkahnya.
+          FlourishCare bukan hanya tentang tumbuh hari ini, tetapi tentang membuka jalan agar setiap anak dapat melangkah lebih jauh dan bersinar dengan caranya sendiri.
         </motion.p>
+
+        <motion.div
+           className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8 max-w-3xl mx-auto"
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.15 }}
+        >
+          {[
+            "Terapis Berlisensi & Berpengalaman", 
+            "Home Visit Tersedia", 
+            "Laporan Progres Digital", 
+            "Evaluasi Besar Setiap 16 Sesi (Gratis newcomer)"
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-2 text-sm sm:text-base font-medium text-text-primary">
+              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
+                <Check size={14} />
+              </div>
+              {item}
+            </div>
+          ))}
+        </motion.div>
 
         <motion.div 
           className="flex flex-col items-center gap-6 mb-12"
@@ -141,12 +163,12 @@ export function Homepage() {
                   Mempercayakan tumbuh kembang anak dengan Rating: ⭐⭐⭐⭐⭐ 4.9/5.
                 </p>
               </div>
-              <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=800" alt="Keluarga" className="w-full h-48 object-cover rounded-2xl mt-auto" referrerPolicy="no-referrer" />
+              <img src="https://i.pinimg.com/1200x/e5/0a/6c/e50a6c0e3bcc4250da025adc00de1d04.jpg" alt="Keluarga" className="w-full h-48 object-cover object-top rounded-2xl mt-auto" referrerPolicy="no-referrer" />
             </div>
 
             {/* Right Col */}
             <div className="flex-1 flex flex-col gap-4 relative">
-              <img src="https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=800" alt="Terapi" className="w-full h-48 object-cover rounded-2xl" referrerPolicy="no-referrer" />
+              <img src="https://i.pinimg.com/1200x/6d/82/74/6d8274aa5abbfb54da6c4206a937b62a.jpg" alt="Terapi" className="w-full h-48 object-cover object-center rounded-2xl" referrerPolicy="no-referrer" />
               <div className="p-2 mt-auto">
                 <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">5 Jenis Terapi Komprehensif</h3>
                 <p className="text-text-secondary text-sm leading-relaxed">
@@ -175,12 +197,12 @@ export function Homepage() {
                   Melihat perkembangan positif anak setelah mengikuti sesi terapi secara rutin.
                 </p>
               </div>
-              <img src="https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&q=80&w=800" alt="Kepuasan" className="w-full h-48 object-cover rounded-2xl mt-auto" referrerPolicy="no-referrer" />
+              <img src="https://i.pinimg.com/736x/6f/3e/1a/6f3e1a1b245e962ce014ba129db9c95f.jpg" alt="Kepuasan" className="w-full h-48 object-cover object-top rounded-2xl mt-auto" referrerPolicy="no-referrer" />
             </div>
 
             {/* Right Col */}
             <div className="flex-1 flex flex-col gap-4 relative">
-              <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800" alt="Home Visit" className="w-full h-48 object-cover rounded-2xl" referrerPolicy="no-referrer" />
+              <img src="https://i.pinimg.com/736x/17/a5/93/17a593c0d112cc6238612d882e725dc0.jpg" alt="Home Visit" className="w-full h-48 object-cover object-[center_30%] rounded-2xl" referrerPolicy="no-referrer" />
               <div className="p-2 mt-auto">
                 <h3 className="font-heading font-bold text-2xl text-text-primary mb-2">Home Visit Radius 15 km</h3>
                 <p className="text-text-secondary text-sm leading-relaxed">
@@ -240,32 +262,42 @@ export function Homepage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full bg-white/50 rounded-[3rem] my-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
-            Layanan Fleksibel Sesuai Kebutuhan
+            Empat Pilar Layanan
           </h2>
           <p className="text-text-secondary text-lg max-w-md">
-            Pilih metode terapi yang paling nyaman untuk anak dan keluarga Anda.
+            Pilih metode yang paling sesuai untuk membantu tumbuh kembang anak Anda secara optimal.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             {
-              title: "Terapi On Site",
-              desc: "Ruang terapi ramah anak, 5 jenis terapi komprehensif untuk stimulasi optimal.",
-              img: "https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=800",
-              features: ["Ruang terapi tematik", "Alat sensori lengkap", "Protokol kebersihan"]
+              title: "Terapi On-Site",
+              desc: "Ruang terapi child-friendly dengan 4 jenis terapi untuk stimulasi optimal di klinik.",
+              img: "https://i.pinimg.com/736x/46/45/5c/46455cbadebbaa67274a94cf8e9780f5.jpg",
+              features: ["Lingkungan child-friendly", "4 jenis terapi komprehensif", "Fasilitas lengkap"],
+              color: "text-bluebell"
             },
             {
-              title: "Home Visit",
-              desc: "Terapis datang ke rumah, radius 15 km. Nyaman, praktis, dan anak belajar di lingkungan sehari-harinya.",
-              img: "https://images.unsplash.com/photo-1602080858428-57174f9431cf?auto=format&fit=crop&q=80&w=800",
-              features: ["Terapis datang ke rumah", "Jadwal fleksibel", "Lingkungan familiar"]
+              title: "Terapi Home Visit",
+              desc: "Terapis datang ke rumah (radius 10 km). Praktis dan anak belajar di lingkungan familiar.",
+              img: "https://i.pinimg.com/736x/5a/43/c6/5a43c601c0c1b3cd8108ed741e9a5e47.jpg",
+              features: ["Terapis datang ke rumah", "Radius jangkauan 10 km", "Lebih nyaman & praktis"],
+              color: "text-secondary"
             },
             {
               title: "Konsultasi Psikolog",
-              desc: "Layanan konsultasi, tes IQ, dan evaluasi perkembangan untuk dukungan emosional dan perilaku.",
-              img: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800",
-              features: ["Tes IQ & Asesmen", "Konseling orang tua", "Dukungan emosional"]
+              desc: "Layanan profesional untuk mendukung perkembangan emosional, perilaku, dan kemampuan anak.",
+              img: "https://i.pinimg.com/736x/9b/f4/aa/9bf4aa9289fc4f58cf9f44b61f258889.jpg",
+              features: ["Psikolog profesional", "Pendekatan holistik", "Dukungan emosional"],
+              color: "text-primary"
+            },
+            {
+              title: "Psikotes",
+              desc: "Tes IQ, evaluasi perkembangan, kesiapan sekolah, hingga tes penegakan diagnosa.",
+              img: "https://i.pinimg.com/736x/32/c2/3f/32c23fc387f75d6bee46cedc34c21174.jpg",
+              features: ["Tes IQ & Evaluasi", "Kesiapan Sekolah", "Penegakan Diagnosa"],
+              color: "text-yellow"
             }
           ].map((service, i) => (
             <motion.div
@@ -273,26 +305,23 @@ export function Homepage() {
               {...fadeUp}
               className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-primary/10 flex flex-col"
             >
-              <div className="h-48 relative">
+              <div className="h-40 relative">
                 <img src={service.img} alt={service.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                <div className="absolute top-4 right-4 bg-white px-4 py-1.5 rounded-full text-sm font-bold text-primary shadow-sm">
-                  Layanan
-                </div>
               </div>
-              <div className="p-8 flex flex-col flex-grow">
-                <h3 className="font-heading font-bold text-2xl text-text-primary mb-3">{service.title}</h3>
-                <p className="text-text-secondary mb-6">{service.desc}</p>
-                <ul className="space-y-3 mb-8 flex-grow">
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className={`font-heading font-bold text-xl mb-3 ${service.color}`}>{service.title}</h3>
+                <p className="text-text-secondary text-sm mb-6 line-clamp-3">{service.desc}</p>
+                <ul className="space-y-2 mb-6 flex-grow">
                   {service.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-text-primary font-medium text-sm">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+                    <li key={idx} className="flex items-center gap-2 text-text-primary font-medium text-xs">
+                      <div className={`w-1.5 h-1.5 rounded-full bg-current ${service.color}`} />
                       {feat}
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-end">
-                  <Link to="/booking" className="text-primary font-bold hover:text-primary-hover transition-colors">
-                    Pelajari Lebih Lanjut
+                <div className="flex justify-end mt-auto">
+                  <Link to="/booking" className="text-primary font-bold text-sm hover:text-primary-hover transition-colors">
+                    Booking
                   </Link>
                 </div>
               </div>
@@ -347,7 +376,7 @@ export function Homepage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600",
+            "https://i.pinimg.com/1200x/56/0b/be/560bbeb052161dbd5def32ec7c9c25d2.jpg",
             "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&q=80&w=600",
             "https://images.unsplash.com/photo-1587691592099-24045742c181?auto=format&fit=crop&q=80&w=600",
             "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?auto=format&fit=crop&q=80&w=600",

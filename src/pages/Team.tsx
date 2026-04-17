@@ -44,20 +44,6 @@ export function Team() {
       image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=800",
       desc: "Berpengalaman dalam menerapkan metode Applied Behavior Analysis (ABA) untuk memodifikasi perilaku anak dengan ASD. Sabar, tegas, dan sangat disukai oleh anak-anak.",
       specialties: ["ABA Therapy", "Modifikasi Perilaku", "Manajemen Tantrum"]
-    },
-    {
-      name: "dr. Sarah Wijaya, Sp.A",
-      role: "Dokter Spesialis Anak (Konsultan)",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=800",
-      desc: "Mitra konsultan medis FlourishCare yang memastikan setiap program terapi sejalan dengan kondisi medis dan tumbuh kembang fisik anak secara keseluruhan.",
-      specialties: ["Tumbuh Kembang", "Pediatri Klinis", "Nutrisi Anak"]
-    },
-    {
-      name: "Dina Karmila, S.Ft., Physio",
-      role: "Fisioterapis Anak",
-      image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800",
-      desc: "Ahli dalam menangani gangguan motorik kasar, cerebral palsy ringan, dan postur tubuh anak. Menggabungkan terapi fisik dengan permainan yang menyenangkan.",
-      specialties: ["Motorik Kasar", "Neuro-Developmental Treatment", "Koreksi Postur"]
     }
   ];
 
