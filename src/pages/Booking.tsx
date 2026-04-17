@@ -27,6 +27,8 @@ const steps = [
 
 export function Booking() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showConsultModal, setShowConsultModal] = useState(false);
+  const [hasAnsweredConsultation, setHasAnsweredConsultation] = useState(false);
   const [formData, setFormData] = useState({
     service: "",
     therapyType: "",
@@ -47,11 +49,31 @@ export function Booking() {
   });
 
   const nextStep = () => {
+    // Intercept Step 1 for Onsite and Home Visit
+    if (currentStep === 1 && (formData.service === "onsite" || formData.service === "homevisit") && !hasAnsweredConsultation) {
+      setShowConsultModal(true);
+      return;
+    }
+
     // Skip paket step if not terapi
     if (currentStep === 2 && formData.service !== "onsite" && formData.service !== "homevisit") {
       setCurrentStep(4);
     } else {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+    }
+  };
+
+  const handleConsultAnswer = (answeredYes: boolean) => {
+    setShowConsultModal(false);
+    setHasAnsweredConsultation(true);
+    
+    if (answeredYes) {
+      // Proceed with chosen therapy
+      setCurrentStep(2);
+    } else {
+      // Switch to psychologist consultation & pre-select to avoid blocking step 2
+      setFormData(prev => ({ ...prev, service: "psikolog", therapyType: "konsultasi" }));
+      setCurrentStep(2);
     }
   };
 
@@ -64,7 +86,7 @@ export function Booking() {
   };
 
   const updateForm = (key: string, value: string) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -133,7 +155,10 @@ export function Booking() {
               {currentStep === 1 && (
                 <Step1Service 
                   selected={formData.service} 
-                  onSelect={(val) => { updateForm("service", val); updateForm("therapyType", ""); }} 
+                  onSelect={(val) => { 
+                    setFormData(prev => ({ ...prev, service: val, therapyType: "" })); 
+                    setHasAnsweredConsultation(false);
+                  }} 
                 />
               )}
               {currentStep === 2 && (
@@ -199,6 +224,43 @@ export function Booking() {
           </div>
         </div>
       </div>
+
+      {/* Consultation Modal Backdrop & Content */}
+      <AnimatePresence>
+        {showConsultModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl relative"
+            >
+              <h3 className="text-2xl font-bold font-heading text-text-primary mb-4 text-center">
+                Apakah Anda sudah melakukan konsultasi dengan psikolog?
+              </h3>
+              <p className="text-text-secondary text-center mb-8">
+                *Jika belum, sebaiknya lakukan sesi konsultasi dengan psikolog terlebih dahulu untuk mendapatkan rekomendasi terapi yang tepat.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  variant="outline" 
+                  className="rounded-xl py-6 flex-1 text-lg"
+                  onClick={() => handleConsultAnswer(true)}
+                >
+                  Sudah
+                </Button>
+                <Button 
+                  className="rounded-xl py-6 flex-1 text-lg bg-primary hover:bg-primary-hover"
+                  onClick={() => handleConsultAnswer(false)}
+                >
+                  Belum (Konsultasi Dulu)
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
