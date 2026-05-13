@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -16,7 +17,9 @@ import {
   Stethoscope,
   ArrowUpRight,
   CheckCircle2,
-  Check
+  Check,
+  Instagram,
+  Heart
 } from "lucide-react";
 
 const fadeUp = {
@@ -26,7 +29,36 @@ const fadeUp = {
   transition: { duration: 0.5 }
 };
 
+interface InstagramPost {
+  id: number;
+  image: string;
+  url: string;
+  likes: number;
+  comments: number;
+}
+
 export function Homepage() {
+  const [igPosts, setIgPosts] = useState<InstagramPost[]>([]);
+
+  useEffect(() => {
+    // Fetch live posts from Curator.io API
+    fetch("https://api.curator.io/v1/feeds/9881e444-26c0-4abf-8a1b-c94e7456fa9d/posts")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.posts) {
+          // Take first 5 posts
+          setIgPosts(data.posts.slice(0, 5).map((post: any) => ({
+            id: post.id,
+            image: post.image_large || post.image,
+            url: post.url,
+            likes: post.likes || 0,
+            comments: post.comments || 0,
+          })));
+        }
+      })
+      .catch(err => console.error("Error fetching Instagram feed:", err));
+  }, []);
+
   const bentoImages = [
     "https://i.pinimg.com/736x/b1/ea/4d/b1ea4d486af624e510e9fc13791843ae.jpg", // Top Left
     "https://i.pinimg.com/736x/a0/6b/7f/a06b7f1cb2de748885a65918d11c6a91.jpg", // Bottom Left
@@ -34,6 +66,15 @@ export function Homepage() {
     "https://i.pinimg.com/1200x/d4/d0/a2/d4d0a26da2bfe6ee86f485332d7cbaaf.jpg", // Top Right
     "https://i.pinimg.com/736x/5e/73/8f/5e738f21883a045057d345c8b5428e08.jpg" // Bottom Right
   ];
+
+  // Map state to display format, fallback to hardcoded if not loaded
+  const displayPosts = igPosts.length === 5 ? igPosts : bentoImages.map((img, i) => ({
+    id: i,
+    image: img,
+    url: "https://www.instagram.com/flourishcare.id/",
+    likes: [124, 89, 256, 145, 112][i],
+    comments: [12, 5, 24, 8, 15][i]
+  }));
 
   return (
     <div className="flex flex-col w-full overflow-hidden bg-background">
@@ -99,11 +140,11 @@ export function Homepage() {
             <span className="text-sm font-bold text-text-primary">4.9/5 Rating Dari 50+ Keluarga</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" asChild className="rounded-full text-lg px-8 py-6 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0">
+            <Button size="lg" asChild className="rounded-full text-base sm:text-lg px-6 py-6 shadow-lg shadow-primary/20 hover:scale-105 transition-transform w-full sm:w-auto">
               <Link to="/booking">Booking Sesi Sekarang</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="rounded-full text-lg px-8 py-6 border-2 hover:bg-primary/5">
+            <Button size="lg" variant="outline" asChild className="rounded-full text-base sm:text-lg px-6 py-6 border-2 hover:bg-primary/5 w-full sm:w-auto">
               <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
                 Konsultasi Gratis via WhatsApp
               </a>
@@ -111,27 +152,76 @@ export function Homepage() {
           </div>
         </motion.div>
 
-        {/* Bento Box Gallery */}
+        {/* Instagram Gallery */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 max-w-6xl mx-auto h-[400px] md:h-[500px]"
+          className="max-w-6xl mx-auto w-full mt-12"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.7 }}
         >
-          <div className="hidden md:block col-span-1 row-span-1 min-h-0">
-            <img src={bentoImages[0]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          <div className="flex items-center justify-between mb-6 px-4 sm:px-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-orange-500 to-pink-500 p-[2px]">
+                <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                  <Instagram className="text-pink-600 w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-left">
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight">@flourishcare.id</h3>
+                <p className="text-xs text-gray-500">Ikuti perjalanan kami di Instagram</p>
+              </div>
+            </div>
+            <a 
+              href="https://www.instagram.com/flourishcare.id/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors hidden sm:block"
+            >
+              Follow Us
+            </a>
           </div>
-          <div className="hidden md:block col-span-1 row-span-1 min-h-0">
-            <img src={bentoImages[1]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+
+          {/* Live Instagram Feed mapped directly to Custom UI */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-1 sm:gap-2">
+            {displayPosts.map((post, index) => (
+              <a 
+                key={post.id} 
+                href={post.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`relative aspect-square group overflow-hidden bg-gray-100 ${index > 3 ? 'hidden lg:block' : ''}`}
+              >
+                <img 
+                  src={post.image} 
+                  alt={`Instagram post ${index + 1}`} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                  referrerPolicy="no-referrer" 
+                />
+                
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 text-white">
+                  <div className="flex items-center gap-1.5 font-semibold text-sm sm:text-base">
+                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
+                    <span>{post.likes}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 font-semibold text-sm sm:text-base">
+                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
+                    <span>{post.comments}</span>
+                  </div>
+                </div>
+              </a>
+            ))}
           </div>
-          <div className="col-span-1 md:col-span-2 md:row-span-2 md:col-start-2 md:row-start-1 min-h-0">
-            <img src={bentoImages[2]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
-          </div>
-          <div className="hidden md:block col-span-1 row-span-1 md:col-start-4 md:row-start-1 min-h-0">
-            <img src={bentoImages[3]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
-          </div>
-          <div className="hidden md:block col-span-1 row-span-1 md:col-start-4 md:row-start-2 min-h-0">
-            <img src={bentoImages[4]} alt="Therapy" className="w-full h-full object-cover rounded-3xl" referrerPolicy="no-referrer" />
+          
+          <div className="mt-6 text-center sm:hidden">
+             <a 
+              href="https://www.instagram.com/flourishcare.id/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 justify-center w-full px-6 py-3 rounded-xl bg-gray-100 text-gray-900 font-semibold text-sm"
+            >
+              <Instagram className="w-4 h-4" /> Lihat Instagam Kami
+            </a>
           </div>
         </motion.div>
       </section>
@@ -262,14 +352,14 @@ export function Homepage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full bg-white/50 rounded-[3rem] my-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <h2 className="text-4xl md:text-5xl font-heading font-extrabold text-text-primary max-w-md leading-tight tracking-tight">
-            Empat Pilar Layanan
+            Pilihan Layanan Kami
           </h2>
           <p className="text-text-secondary text-lg max-w-md">
             Pilih metode yang paling sesuai untuk membantu tumbuh kembang anak Anda secara optimal.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
               title: "Terapi On-Site",
@@ -286,8 +376,15 @@ export function Homepage() {
               color: "text-secondary"
             },
             {
+              title: "Konsultasi Psikolog Daring",
+              desc: "Konsultasi psikolog profesional secara praktis dan fleksibel melalui Video Call dari manapun.",
+              img: "https://images.pexels.com/photos/4474038/pexels-photo-4474038.jpeg?_gl=1*1hr9jvm*_ga*NDU4MTM3Njg1LjE3Nzg1NDgzMzE.*_ga_8JE65Q40S6*czE3Nzg1NDgzMzEkbzEkZzEkdDE3Nzg1NDg2OTAkajIwJGwwJGgw",
+              features: ["Via Zoom/Google Meet", "Waktu lebih fleksibel", "Nyaman dari rumah"],
+              color: "text-red-500"
+            },
+            {
               title: "Konsultasi Psikolog",
-              desc: "Layanan profesional untuk mendukung perkembangan emosional, perilaku, dan kemampuan anak.",
+              desc: "Layanan profesional untuk mendukung perkembangan emosional, perilaku, dan kemampuan anak tatap muka di klinik.",
               img: "https://i.pinimg.com/736x/9b/f4/aa/9bf4aa9289fc4f58cf9f44b61f258889.jpg",
               features: ["Psikolog profesional", "Pendekatan holistik", "Dukungan emosional"],
               color: "text-primary"
@@ -422,11 +519,11 @@ export function Homepage() {
             <p className="text-text-secondary mb-8">
               Tim kami siap membantu Anda menemukan layanan yang paling tepat untuk kebutuhan si kecil.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild className="rounded-full text-lg px-8 py-6 shadow-lg shadow-primary/20">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Button size="lg" asChild className="rounded-full text-base sm:text-lg px-6 sm:px-8 py-6 shadow-lg shadow-primary/20 w-full sm:w-auto">
                 <Link to="/booking">Booking Sekarang</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="rounded-full text-lg px-8 py-6 border-2">
+              <Button size="lg" variant="outline" asChild className="rounded-full text-base sm:text-lg px-6 sm:px-8 py-6 border-2 w-full sm:w-auto">
                 <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
                   Hubungi Kami
                 </a>

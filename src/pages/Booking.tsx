@@ -13,7 +13,8 @@ import {
   ChevronRight,
   ChevronLeft,
   ClipboardCheck,
-  QrCode
+  QrCode,
+  Video
 } from "lucide-react";
 
 const steps = [
@@ -271,7 +272,8 @@ function Step1Service({ selected, onSelect }: { selected: string, onSelect: (val
   const options = [
     { id: "onsite", title: "Terapi On-Site", icon: Building2, desc: "Sesi terapi di klinik FlourishCare" },
     { id: "homevisit", title: "Terapi Home Visit", icon: Home, desc: "Terapis datang ke rumah Anda" },
-    { id: "psikolog", title: "Konsultasi Psikolog", icon: Stethoscope, desc: "Sesi konsultasi dengan psikolog berpengalaman" },
+    { id: "psikolog_online", title: "Psikolog Online", icon: Video, desc: "Konseling via Video Call dari mana saja" },
+    { id: "psikolog", title: "Konsultasi Psikolog", icon: Stethoscope, desc: "Sesi tatap muka dengan psikolog berpengalaman" },
     { id: "psikotes", title: "Psikotes & Asesmen", icon: ClipboardCheck, desc: "Evaluasi perkembangan & IQ" }
   ];
 
@@ -318,6 +320,10 @@ function Step2Therapy({ service, selected, onSelect }: { service: string, select
   } else if (service === "psikolog") {
     options = [
       { id: "konsultasi", title: "Konsultasi Psikolog", desc: "Sesi konseling orang tua / anak" }
+    ];
+  } else if (service === "psikolog_online") {
+    options = [
+      { id: "konsultasi_online", title: "Konsultasi Psikolog Online", desc: "Sesi konseling orang tua / anak via Video Call" }
     ];
   } else if (service === "psikotes") {
     options = [
@@ -585,8 +591,8 @@ function Step6Payment({ data, updateForm }: { data: any, updateForm: any }) {
       <div className="bg-background rounded-2xl p-6 mb-6 border border-primary/10">
         <h3 className="font-bold text-lg mb-4">Ringkasan Booking</h3>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-text-secondary">Layanan:</span> <span className="font-medium capitalize">{data.service || "-"}</span></div>
-          <div className="flex justify-between"><span className="text-text-secondary">Jenis Layanan:</span> <span className="font-medium">{data.therapyType || "-"}</span></div>
+          <div className="flex justify-between"><span className="text-text-secondary">Layanan:</span> <span className="font-medium capitalize">{data.service?.replace('_', ' ') || "-"}</span></div>
+          <div className="flex justify-between"><span className="text-text-secondary">Jenis Layanan:</span> <span className="font-medium">{data.therapyType?.replace('_', ' ') || "-"}</span></div>
           {(data.service === 'onsite' || data.service === 'homevisit') && (
             <>
               <div className="flex justify-between"><span className="text-text-secondary">Paket:</span> <span className="font-medium">{data.package ? `${data.package} Sesi` : "-"}</span></div>

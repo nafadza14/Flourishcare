@@ -19,10 +19,24 @@ export function Team() {
   const teamMembers = [
     {
       name: "Achla Himmah M.Psi., Psikolog",
-      role: "Psikolog Anak & Remaja",
+      role: "Psikolog",
       image: "https://i.ibb.co/DPpMtgtw/Whats-App-Image-2026-04-07-at-21-44-20.jpg",
       desc: "Lulusan Magister Profesi Psikologi UGM. Berpengalaman lebih dari 8 tahun dalam menangani kasus autisme, ADHD, dan gangguan kecemasan pada anak. Bersertifikasi dalam Play Therapy.",
       specialties: ["Asesmen Psikologi", "Play Therapy", "Parenting Counseling"]
+    },
+    {
+      name: "Ukhtina D Anindita M.Psi., Psikolog",
+      role: "Psikolog",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=800",
+      desc: "Psikolog klinis yang berpengalaman dalam menangani isu kesehatan mental anak, remaja, maupun keluarga. Memiliki dedikasi tinggi terhadap kesejahteraan psikologis klien.",
+      specialties: ["Konseling Keluarga", "Kesehatan Mental", "Psikoterapi"]
+    },
+    {
+      name: "Rofanny Haznatu P KM.Psi., Psikolog",
+      role: "Psikolog",
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
+      desc: "Berpengalaman memberikan asesmen yang komprehensif dan intervensi klinis dengan pendekatan terapeutik dan holistik bagi tumbuh kembang optimal anak.",
+      specialties: ["Asesmen Psikologi", "Intervensi Klinis", "Konseling"]
     },
     {
       name: "Budi Santoso, S.Tr.Kes., OT",
