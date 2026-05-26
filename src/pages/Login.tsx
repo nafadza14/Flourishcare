@@ -1,14 +1,37 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, authenticate here. For preview, just redirect.
-    navigate("/dashboard");
+    setError(null);
+    setLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      // Successfully authenticated
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to login. Please check your credentials.");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,14 +55,21 @@ export function Login() {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">
+              {error}
+            </div>
+          )}
+          
           <div className="space-y-2">
             <label className="text-sm font-medium text-text-primary">Email</label>
             <input 
               type="email" 
-              placeholder="nama@flourishcare.id" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="username@flourishcare.id" 
               required 
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" 
-              defaultValue="demo@flourishcare.id" 
             />
           </div>
           
@@ -50,15 +80,16 @@ export function Login() {
             </div>
             <input 
               type="password" 
-              placeholder="••••••••" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="your password" 
               required 
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" 
-              defaultValue="password123" 
             />
           </div>
 
-          <Button type="submit" className="w-full rounded-xl py-6 text-lg shadow-md shadow-primary/20">
-            Masuk ke Dashboard
+          <Button type="submit" disabled={loading} className="w-full rounded-xl py-6 text-lg shadow-md shadow-primary/20">
+            {loading ? "Memproses..." : "Masuk ke Dashboard"}
           </Button>
         </form>
 
