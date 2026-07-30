@@ -7,7 +7,7 @@ import {
   SOCIAL,
 } from "@/config/constants";
 
-// Ikon Threads & TikTok tidak tersedia di lucide — pakai SVG inline.
+// Ikon Threads & TikTok tidak tersedia di lucide , pakai SVG inline.
 function ThreadsIcon({ size = 20 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -29,7 +29,7 @@ export function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
           <div className="space-y-4">
-            <Logo className="h-16 w-auto object-contain" />
+            <Logo className="h-28 w-auto object-contain" />
             <p className="text-text-secondary text-sm leading-relaxed max-w-md">
               Tumbuh Bersama, Flourish Sepenuhnya. Menghadirkan terapi tumbuh kembang profesional untuk anak Anda.
             </p>

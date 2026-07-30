@@ -57,7 +57,7 @@ export function About() {
               Akses ke terapis dan psikolog anak yang tepercaya seringkali terhambat oleh jarak, antrean panjang di rumah sakit, atau lingkungan yang tidak ramah bagi anak. Banyak orang tua menemukan diri mereka mencari jawaban di internet tanpa mendapatkan panduan profesional yang membantu.
             </p>
             <p>
-              Kami hadir untuk mengubah hal itu. FlourishCare membangun ekosistem terapi yang hangat, ramah anak, dan mudah diakses untuk keluarga di Jakarta Timur — hadir di Klinik Mitra Diani dengan tim profesional yang berpengalaman dan berdedikasi.
+              Kami hadir untuk mengubah hal itu. FlourishCare membangun ekosistem terapi yang hangat, ramah anak, dan mudah diakses untuk keluarga di Jakarta Timur. Kami hadir di Klinik Mitra Diani dengan tim profesional yang berpengalaman dan berdedikasi.
             </p>
           </motion.div>
 

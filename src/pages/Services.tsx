@@ -53,7 +53,7 @@ const PILLARS = [
     icon: Video,
     title: "Konsultasi Psikolog Online",
     tagline: BOOKING_ONLINE_STATUS === "live" ? "Sesi jarak jauh yang fleksibel" : "Segera hadir",
-    desc: "Sesi konsultasi psikolog secara online yang fleksibel dan mudah diakses — cocok untuk orang tua yang membutuhkan arahan cepat, konsultasi lanjutan, atau berdomisili di luar Jakarta. Dilakukan melalui platform booking terpisah.",
+    desc: "Sesi konsultasi psikolog secara online yang fleksibel dan mudah diakses, cocok untuk orang tua yang membutuhkan arahan cepat, konsultasi lanjutan, atau berdomisili di luar Jakarta. Dilakukan melalui platform booking terpisah.",
     features: [
       "Fleksibel dari mana saja",
       "Sesi terjadwal via video call",
@@ -130,7 +130,7 @@ export function Services() {
             <span className="font-accent text-primary text-6xl md:text-7xl">yang komprehensif</span>
           </h1>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            Kami menyediakan spektrum layanan lengkap — dari konsultasi psikolog, asesmen menyeluruh, hingga 4 jenis terapi klinis — semuanya dilakukan on-site di Klinik Mitra Diani, Jakarta Timur.
+            Kami menyediakan spektrum layanan lengkap mulai dari konsultasi psikolog, asesmen menyeluruh, hingga 4 jenis terapi klinis. Semuanya dilakukan on-site di Klinik Mitra Diani, Jakarta Timur.
           </p>
         </div>
       </section>

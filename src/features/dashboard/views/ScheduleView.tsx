@@ -48,7 +48,7 @@ export function ScheduleView() {
               <li key={s.id} className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold">
-                    {new Date(s.scheduled_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} — Sesi #{s.id.slice(0, 6)}
+                    {new Date(s.scheduled_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} • Sesi #{s.id.slice(0, 6)}
                   </p>
                   <p className="text-xs text-text-secondary">Durasi {s.duration_min} menit</p>
                 </div>

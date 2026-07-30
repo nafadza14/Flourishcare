@@ -65,8 +65,8 @@ export function BookingsView() {
               <tr key={b.id} className="hover:bg-background/60">
                 <td className="px-4 py-3 font-mono text-xs">{b.code}</td>
                 <td className="px-4 py-3 capitalize">{b.service.replace("_", " ")}</td>
-                <td className="px-4 py-3">{b.therapy_type ?? "—"}</td>
-                <td className="px-4 py-3">{b.package_sessions ? `${b.package_sessions} sesi` : "—"}</td>
+                <td className="px-4 py-3">{b.therapy_type ?? "-"}</td>
+                <td className="px-4 py-3">{b.package_sessions ? `${b.package_sessions} sesi` : "-"}</td>
                 <td className="px-4 py-3 text-text-secondary">
                   {new Date(b.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
                 </td>

@@ -78,7 +78,7 @@ export function PatientsView() {
                       {new Date(c.dob).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3">{c.gender === "L" ? "Laki-laki" : "Perempuan"}</td>
-                    <td className="px-4 py-3 text-text-secondary">{c.primary_condition ?? "—"}</td>
+                    <td className="px-4 py-3 text-text-secondary">{c.primary_condition ?? "-"}</td>
                   </tr>
                 ))}
               </tbody>

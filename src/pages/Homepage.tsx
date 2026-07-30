@@ -119,7 +119,7 @@ const SERVICES = [
   {
     icon: Video,
     title: "Konsultasi Psikolog Online",
-    desc: "Sesi konsultasi jarak jauh yang fleksibel — cocok untuk orang tua yang membutuhkan arahan cepat, konsultasi lanjutan, atau berdomisili di luar Jakarta.",
+    desc: "Sesi konsultasi jarak jauh yang fleksibel, cocok untuk orang tua yang membutuhkan arahan cepat, konsultasi lanjutan, atau berdomisili di luar Jakarta.",
     tag: BOOKING_ONLINE_STATUS === "live" ? "Online" : "Opening Soon",
     to: "/booking",
   },
@@ -150,7 +150,7 @@ const HOW_STEPS = [
     step: "02",
     icon: ClipboardCheck,
     title: "Asesmen Menyeluruh",
-    desc: "Psikolog melakukan asesmen komprehensif untuk memahami kebutuhan spesifik anak — dari perkembangan bicara, motorik, sensori, hingga emosi.",
+    desc: "Psikolog melakukan asesmen komprehensif untuk memahami kebutuhan spesifik anak, mulai dari perkembangan bicara, motorik, sensori, hingga emosi.",
   },
   {
     step: "03",
@@ -176,7 +176,7 @@ export function Homepage() {
   const [igPosts, setIgPosts] = useState<InstagramPost[]>([]);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
 
-  // Fetch Instagram feed dari Curator.io — fallback ke IG_FALLBACK bila gagal
+  // Fetch Instagram feed dari Curator.io : fallback ke IG_FALLBACK bila gagal
   useEffect(() => {
     let cancelled = false;
     fetch("https://api.curator.io/v1/feeds/9881e444-26c0-4abf-8a1b-c94e7456fa9d/posts")
@@ -207,7 +207,7 @@ export function Homepage() {
     };
   }, []);
 
-  // Fetch galeri kegiatan dari tabel `gallery` di Supabase — fallback ke GALLERY_FALLBACK
+  // Fetch galeri kegiatan dari tabel `gallery` di Supabase : fallback ke GALLERY_FALLBACK
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -359,7 +359,7 @@ export function Homepage() {
         </div>
       </section>
 
-      {/* NILAI & KEUNGGULAN — Bento Grid */}
+      {/* NILAI & KEUNGGULAN : Bento Grid */}
       <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="blob blob-lavender w-[280px] h-[280px] top-10 right-10" />
 
@@ -451,7 +451,7 @@ export function Homepage() {
               Pendampingan yang <span className="font-accent text-primary text-5xl md:text-6xl">tepat</span>
             </h2>
             <p className="text-text-secondary max-w-2xl mx-auto">
-              Kami menyediakan beragam layanan untuk memenuhi kebutuhan tumbuh kembang anak Anda — mulai dari terapi klinis hingga konsultasi psikolog online.
+              Kami menyediakan beragam layanan untuk memenuhi kebutuhan tumbuh kembang anak Anda, mulai dari terapi klinis hingga konsultasi psikolog online.
             </p>
           </motion.div>
 
@@ -512,7 +512,7 @@ export function Homepage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS — 5 langkah */}
+      {/* HOW IT WORKS : 5 langkah */}
       <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8">
         <div className="blob blob-lavender w-[280px] h-[280px] top-1/2 left-1/4" />
 
@@ -552,7 +552,7 @@ export function Homepage() {
         </div>
       </section>
 
-      {/* GALERI KEGIATAN — 8 foto */}
+      {/* GALERI KEGIATAN : 8 foto */}
       <section className="relative py-16 md:py-20 px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 max-w-6xl mx-auto">
           <motion.div className="text-center mb-10" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -581,7 +581,7 @@ export function Homepage() {
         </div>
       </section>
 
-      {/* ALAMAT KLINIK — CTA FINAL */}
+      {/* ALAMAT KLINIK : CTA FINAL */}
       <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8">
         <div className="blob blob-peach w-[380px] h-[380px] top-10 -right-16" />
         <div className="blob blob-sage w-[300px] h-[300px] bottom-0 -left-10" />

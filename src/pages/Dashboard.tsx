@@ -78,7 +78,7 @@ export function Dashboard() {
         }`}
       >
         <div className="p-4 border-b border-primary/10 flex items-center justify-between">
-          <Logo className="h-10 w-auto" />
+          <Logo className="h-16 w-auto" />
           <button className="lg:hidden text-text-secondary" onClick={() => setSidebarOpen(false)} aria-label="Tutup menu">
             <X size={20} />
           </button>
@@ -105,7 +105,7 @@ export function Dashboard() {
         <div className="p-3 border-t border-primary/10">
           <div className="px-3 py-2 mb-2">
             <p className="text-xs text-text-secondary">Masuk sebagai</p>
-            <p className="text-sm font-semibold text-text-primary truncate">{profile?.full_name ?? "—"}</p>
+            <p className="text-sm font-semibold text-text-primary truncate">{profile?.full_name ?? "-"}</p>
             <p className="text-xs text-primary capitalize">{role?.replace("_", " ") ?? ""}</p>
           </div>
           <button

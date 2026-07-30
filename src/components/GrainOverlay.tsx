@@ -1,4 +1,4 @@
-// Global grain/noise overlay — mimicking paper texture.
+// Global grain/noise overlay , mimicking paper texture.
 // Reference spec: SVG feTurbulence, mix-blend-mode overlay, opacity 0.35.
 
 const NOISE_SVG =

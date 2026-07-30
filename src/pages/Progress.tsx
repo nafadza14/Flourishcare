@@ -226,7 +226,7 @@ function SnapshotView({ snapshot, onSignOut }: { snapshot: Snapshot; onSignOut: 
         <div className="flex items-baseline justify-between mb-3">
           <p className="text-3xl font-heading font-extrabold text-primary">
             {snapshot.sessions_done}
-            <span className="text-text-secondary text-lg font-medium"> / {snapshot.sessions_total || "—"}</span>
+            <span className="text-text-secondary text-lg font-medium"> / {snapshot.sessions_total || "?"}</span>
           </p>
           {snapshot.therapist_name && (
             <p className="text-xs text-text-secondary">Terapis: {snapshot.therapist_name}</p>

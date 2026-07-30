@@ -77,7 +77,7 @@ export function FinanceView() {
                       {new Date(r.paid_at ?? r.created_at).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs">{r.booking_id.slice(0, 8)}</td>
-                    <td className="px-4 py-3">{r.method ?? "—"}</td>
+                    <td className="px-4 py-3">{r.method ?? "-"}</td>
                     <td className="px-4 py-3 font-semibold">{formatRupiah(Number(r.amount))}</td>
                     <td className="px-4 py-3">
                       <span

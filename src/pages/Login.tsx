@@ -61,7 +61,7 @@ export function Login() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="flex justify-center mb-6">
-          <Logo className="h-14 w-auto" />
+          <Logo className="h-24 w-auto" />
         </div>
         <div className="bg-white rounded-[2rem] p-8 border border-primary/10 shadow-warm-lg">
           <div className="text-center mb-6">

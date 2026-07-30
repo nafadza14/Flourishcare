@@ -23,7 +23,7 @@ export function Navbar() {
     <header className="sticky top-3 z-50 w-full px-4 mt-3">
       <div className="max-w-6xl mx-auto rounded-full bg-white/70 backdrop-blur-xl border border-primary/10 shadow-warm-sm">
         <div className="flex px-4 md:px-5 py-2 items-center justify-between gap-4">
-          <Logo className="h-9 md:h-11 w-auto object-contain" />
+          <Logo className="h-16 md:h-20 w-auto object-contain" />
 
           <nav className="hidden lg:flex items-center gap-6">
             {MENU.map((m) => (

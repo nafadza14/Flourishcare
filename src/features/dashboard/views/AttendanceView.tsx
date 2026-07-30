@@ -174,7 +174,8 @@ export function AttendanceView() {
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate">{l.reason}</p>
                   <p className="text-xs text-text-secondary">
-                    {new Date(l.start_date).toLocaleDateString("id-ID")} —{" "}
+                    {new Date(l.start_date).toLocaleDateString("id-ID")}
+                    {" s/d "}
                     {new Date(l.end_date).toLocaleDateString("id-ID")}
                   </p>
                 </div>

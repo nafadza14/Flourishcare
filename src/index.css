@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  /* Typography — Digital Wellness reference */
+  /* Typography , Digital Wellness reference */
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-accent: "Reenie Beanie", cursive;
 
-  /* Color palette — Digital Wellness reference, primary di-override ke brand FlourishCare */
+  /* Color palette , Digital Wellness reference, primary di-override ke brand FlourishCare */
   --color-background: #FDFCF8;           /* off-white paper */
   --color-surface: #FFFFFF;
   --color-text-primary: #292524;         /* soft-black stone */
@@ -23,7 +23,7 @@
   --color-yellow: #F5BB3E;
   --color-red: #E8212A;
 
-  /* Soft shadows — reference black-tint rgba(0,0,0,0.05) */
+  /* Soft shadows , reference black-tint rgba(0,0,0,0.05) */
   --shadow-warm-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
   --shadow-warm: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
   --shadow-warm-lg: 0 12px 40px -6px rgba(0, 0, 0, 0.08);
@@ -62,7 +62,7 @@
   .bg-lavender { background-color: var(--color-lavender); }
 }
 
-/* Background blobs — pastel from reference palette */
+/* Background blobs , pastel from reference palette */
 .blob {
   position: absolute;
   border-radius: 9999px;

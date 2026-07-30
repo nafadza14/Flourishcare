@@ -1,4 +1,4 @@
-// Tipe database Supabase — versi minimum yang dipakai frontend saat ini.
+// Tipe database Supabase , versi minimum yang dipakai frontend saat ini.
 // Regenerate otomatis dengan: `supabase gen types typescript --project-id <id> > src/types/database.ts`
 // setelah menjalankan migration SQL di supabase/migrations/.
 

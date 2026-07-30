@@ -150,7 +150,7 @@ export function Team() {
                     )}
                     {/* Polaroid signature */}
                     <div className="mt-5 pt-4 border-t border-black/5">
-                      <span className="font-accent text-2xl text-text-secondary/70">— {s.title.split(" ")[0]}</span>
+                      <span className="font-accent text-2xl text-text-secondary/70">{s.title.split(" ")[0]}</span>
                     </div>
                   </div>
                 </motion.article>
@@ -175,7 +175,7 @@ export function Team() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-center">
             {[
               { icon: Award, title: "Lisensi Resmi", desc: "Seluruh psikolog kami memiliki STR (Surat Tanda Registrasi) aktif dan berlisensi resmi." },
-              { icon: GraduationCap, title: "Berpengalaman", desc: "Berpengalaman menangani berbagai kasus tumbuh kembang anak — dari asesmen hingga intervensi." },
+              { icon: GraduationCap, title: "Berpengalaman", desc: "Berpengalaman menangani berbagai kasus tumbuh kembang anak, mulai dari asesmen hingga intervensi." },
               { icon: Sparkles, title: "Empatis", desc: "Membangun kepercayaan bersama anak dan orang tua melalui pendekatan yang hangat dan sabar." },
             ].map((k) => (
               <div key={k.title} className="bg-white rounded-3xl p-6 border border-black/5 shadow-warm-sm">
