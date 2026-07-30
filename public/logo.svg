@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" role="img" aria-label="FlourishCare.id">
+  <defs>
+    <linearGradient id="fcGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F29935"/>
+      <stop offset="100%" stop-color="#F5BB3E"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(10,15)">
+    <!-- Leaf mark -->
+    <path d="M45 8 C 20 20, 12 55, 35 82 C 50 66, 70 55, 70 30 C 70 18, 60 8, 45 8 Z"
+          fill="url(#fcGrad)"/>
+    <path d="M43 78 C 43 55, 55 40, 68 33" stroke="#7A4C3D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(100,45)">
+    <text x="0" y="30" font-family="Poppins, Nunito, sans-serif" font-weight="700" font-size="34" fill="#7A4C3D">
+      Flourish<tspan fill="#F29935">Care</tspan><tspan font-weight="500" fill="#9A6C5D" font-size="24">.id</tspan>
+    </text>
+    <text x="2" y="55" font-family="Poppins, sans-serif" font-weight="400" font-size="12" fill="#9A6C5D" letter-spacing="1.5">
+      TUMBUH BERSAMA, FLOURISH SEPENUHNYA
+    </text>
+  </g>
+</svg>

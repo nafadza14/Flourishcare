@@ -1,102 +1,126 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Loader2, Lock, LogIn, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/providers/AuthProvider";
 
 export function Login() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const { session } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const redirect = params.get("redirect") ?? "/dashboard";
+
+  useEffect(() => {
+    if (session) navigate(redirect, { replace: true });
+  }, [session, redirect, navigate]);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+      const { error: err } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
         password,
       });
-
-      if (error) throw error;
-      
-      // Successfully authenticated
-      navigate("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Failed to login. Please check your credentials.");
-      console.error("Login error:", err);
+      if (err) throw err;
+      navigate(redirect, { replace: true });
+    } catch (err) {
+      setError("Email atau kata sandi salah.");
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  async function handleForgot() {
+    if (!email) {
+      setError("Masukkan email dulu untuk mengirim tautan reset.");
+      return;
+    }
+    setError(null);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+    if (err) setError("Gagal mengirim tautan reset. Coba lagi nanti.");
+    else setError("Tautan reset kata sandi telah dikirim ke email Anda.");
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full bg-white p-8 rounded-[2rem] shadow-lg border border-primary/10"
-      >
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-6">
-            <img 
-              src="https://i.pinimg.com/736x/e2/11/9a/e2119a970264b1116bf8c76318d1265a.jpg" 
-              alt="FlourishCare Logo" 
-              className="h-16 w-auto object-contain mix-blend-multiply mx-auto" 
-              referrerPolicy="no-referrer" 
-            />
-          </Link>
-          <h1 className="text-2xl font-heading font-bold text-text-primary">Selamat Datang Kembali</h1>
-          <p className="text-text-secondary mt-2">Silakan login untuk mengakses sistem FlourishCare.</p>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md">
+        <div className="flex justify-center mb-6">
+          <Logo className="h-16 w-auto" />
         </div>
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-text-primary">Email</label>
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="username@flourishcare.id" 
-              required 
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" 
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-sm font-medium text-text-primary">Password</label>
-              <a href="#" className="text-xs text-primary hover:underline">Lupa password?</a>
-            </div>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="your password" 
-              required 
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" 
-            />
+        <div className="bg-white rounded-3xl p-8 border border-primary/10 shadow-sm">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-heading font-bold">Masuk Dashboard</h1>
+            <p className="text-sm text-text-secondary mt-1">Hanya untuk internal FlourishCare.</p>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full rounded-xl py-6 text-lg shadow-md shadow-primary/20">
-            {loading ? "Memproses..." : "Masuk ke Dashboard"}
-          </Button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-1.5">Email</label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-1.5">Kata Sandi</label>
+              <div className="relative">
+                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
 
-        <div className="mt-8 text-center text-sm text-text-secondary">
-          <p>Hanya untuk internal FlourishCare.</p>
+            {error && (
+              <div className="text-sm text-red bg-red/10 border border-red/20 rounded-xl px-4 py-3">{error}</div>
+            )}
+
+            <Button type="submit" className="w-full rounded-full" size="lg" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin mr-2" size={18} /> Memproses…
+                </>
+              ) : (
+                <>
+                  <LogIn size={18} className="mr-2" /> Masuk
+                </>
+              )}
+            </Button>
+
+            <div className="flex items-center justify-between text-xs">
+              <button type="button" onClick={handleForgot} className="text-primary hover:underline">
+                Lupa kata sandi?
+              </button>
+              <Link to="/" className="text-text-secondary hover:text-primary">Kembali ke Beranda</Link>
+            </div>
+          </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

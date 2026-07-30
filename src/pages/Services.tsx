@@ -1,199 +1,129 @@
 import { motion } from "framer-motion";
-import { MessageSquare, Activity, Brain, Smile, Stethoscope, Home, Building2, ClipboardCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  Building2,
+  Brain,
+  Stethoscope,
+  Sparkles,
+  Puzzle,
+  HandHeart,
+  MessageSquare,
+  Wand2,
+  ArrowUpRight,
+  MapPin,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { fadeUp, stagger } from "@/lib/motion";
+import { CLINIC_ADDRESS, CLINIC_MAPS_URL } from "@/config/constants";
 
-const fadeUp = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5 }
-};
+const PILLARS = [
+  {
+    id: "onsite",
+    icon: Building2,
+    title: "Terapi On-Site",
+    desc: "Sesi terapi anak dilakukan di Klinik Mitra Diani bersama terapis kami yang berpengalaman.",
+  },
+  {
+    id: "psikolog",
+    icon: Stethoscope,
+    title: "Konsultasi Psikolog",
+    desc: "Konsultasi tatap muka bersama psikolog anak untuk asesmen awal, arahan terapi, dan konseling keluarga.",
+  },
+  {
+    id: "psikotes",
+    icon: Brain,
+    title: "Psikotes & Assessment",
+    desc: "Tes IQ, kesiapan sekolah, evaluasi perkembangan, dan diagnosa profesional oleh psikolog berlisensi.",
+  },
+];
 
-const staggerContainer = {
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true },
-  transition: { staggerChildren: 0.1 }
-};
+const THERAPIES = [
+  { code: "TW", icon: MessageSquare, title: "Terapi Wicara", desc: "Untuk anak dengan keterlambatan bicara atau gangguan artikulasi." },
+  { code: "SI", icon: Puzzle, title: "Sensori Integrasi", desc: "Membantu anak mengolah stimulasi sensorik dan merespons dengan tepat." },
+  { code: "OT", icon: HandHeart, title: "Okupasi Terapi", desc: "Melatih kemandirian aktivitas sehari-hari dan keterampilan motorik." },
+  { code: "BT", icon: Wand2, title: "Behavioral Therapy", desc: "Pendekatan berbasis bukti untuk membentuk perilaku positif." },
+];
 
 export function Services() {
-  const therapies = [
-    {
-      title: "Terapi Wicara (Speech Therapy)",
-      desc: "Membantu anak yang mengalami keterlambatan bicara, gangguan artikulasi, gagap, atau kesulitan memahami bahasa. Terapis kami menggunakan metode bermain yang interaktif untuk merangsang kemampuan komunikasi verbal dan nonverbal anak.",
-      icon: MessageSquare,
-      color: "bg-bluebell/20 text-bluebell",
-      borderColor: "border-bluebell/30"
-    },
-    {
-      title: "Sensori Integrasi (SI)",
-      desc: "Dirancang untuk anak yang mengalami gangguan pemrosesan sensori (terlalu sensitif atau kurang sensitif terhadap sentuhan, suara, cahaya). Terapi ini membantu otak anak memproses informasi sensori dengan lebih baik melalui aktivitas fisik yang terstruktur.",
-      icon: Activity,
-      color: "bg-orange/20 text-orange",
-      borderColor: "border-orange/30"
-    },
-    {
-      title: "Terapi Okupasi (Occupational Therapy)",
-      desc: "Fokus pada peningkatan kemandirian anak dalam aktivitas sehari-hari (makan, berpakaian, menulis). Sangat direkomendasikan untuk anak dengan gangguan motorik halus, motorik kasar, dan koordinasi mata-tangan.",
-      icon: Brain,
-      color: "bg-primary/20 text-primary",
-      borderColor: "border-primary/30"
-    },
-    {
-      title: "Behavioral Therapy (Terapi Perilaku)",
-      desc: "Pendekatan terstruktur untuk memodifikasi perilaku anak, mengurangi tantrum, agresi, atau perilaku repetitif. Sangat efektif untuk anak dengan spektrum autisme (ASD) atau ADHD untuk membantu mereka beradaptasi dengan lingkungan sosial.",
-      icon: Smile,
-      color: "bg-yellow/20 text-yellow",
-      borderColor: "border-yellow/30"
-    }
-  ];
-
   return (
-    <div className="flex flex-col w-full overflow-hidden bg-background">
-      {/* Header */}
-      <section className="pt-20 pb-16 bg-white border-b border-primary/10">
-        <div className="container mx-auto px-4 max-w-4xl text-center">
-          <motion.h1 
-            className="text-4xl md:text-5xl font-heading font-bold text-text-primary mb-6"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Layanan Komprehensif FlourishCare
-          </motion.h1>
-          <motion.p 
-            className="text-lg text-text-secondary leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Didesain khusus untuk memenuhi kebutuhan unik setiap anak. Kami hadir melalui empat pilar layanan utama untuk mendukung tumbuh kembang optimal si kecil.
-          </motion.p>
+    <div className="bg-background">
+      {/* Hero */}
+      <section className="pt-12 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Layanan Kami</p>
+          <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-4">
+            Pendampingan Tumbuh Kembang <span className="text-primary">yang Komprehensif</span>
+          </h1>
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+            Seluruh layanan kami dilakukan on-site di Klinik Mitra Diani, Jakarta Timur.
+          </p>
         </div>
       </section>
 
-      {/* 4 Pillars Delivery Methods */}
-      <section className="py-16">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-8 mb-20">
-            {/* Pilar 1 */}
-            <motion.div 
-              className="bg-white p-8 rounded-3xl border border-primary/10 shadow-lg shadow-primary/5 flex flex-col items-start"
-              {...fadeUp}
+      {/* 3 Pilar */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
+        <motion.div
+          className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6"
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {PILLARS.map((p) => (
+            <motion.div
+              key={p.id}
+              id={p.id}
+              variants={fadeUp}
+              className="bg-white rounded-2xl p-6 md:p-8 border border-primary/10 shadow-sm flex flex-col scroll-mt-24"
             >
-              <div className="w-16 h-16 rounded-2xl bg-bluebell/20 text-bluebell flex items-center justify-center mb-6">
-                <Building2 size={32} />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                <p.icon size={22} />
               </div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary mb-4">Terapi On-Site</h2>
-              <p className="text-text-secondary leading-relaxed mb-6 flex-grow">
-                Fasilitas ruang terapi yang child-friendly di klinik kami. Di sini, kami menawarkan 4 jenis terapi komprehensif. Lingkungan yang terkontrol membantu anak lebih fokus selama sesi terapi.
-              </p>
-              <ul className="space-y-2 mb-8 w-full">
-                {["Ruang terapi tematik", "4 Jenis Terapi (SI, TW, OT, BT)", "Alat sensori lengkap"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" /> {item}
-                  </li>
-                ))}
-              </ul>
+              <h3 className="font-heading font-bold text-xl mb-2">{p.title}</h3>
+              <p className="text-sm text-text-secondary leading-relaxed flex-grow">{p.desc}</p>
+              <Link
+                to="/booking"
+                className="mt-5 inline-flex items-center gap-1 text-primary font-semibold text-sm hover:gap-2 transition-all"
+              >
+                Info Kunjungan <ArrowUpRight size={16} />
+              </Link>
             </motion.div>
+          ))}
+        </motion.div>
+      </section>
 
-            {/* Pilar 2 */}
-            <motion.div 
-              className="bg-white p-8 rounded-3xl border border-primary/10 shadow-lg shadow-primary/5 flex flex-col items-start"
-              {...fadeUp}
-              transition={{ delay: 0.1 }}
-            >
-              <div className="w-16 h-16 rounded-2xl bg-secondary/20 text-secondary flex items-center justify-center mb-6">
-                <Home size={32} />
-              </div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary mb-4">Terapi Home Visit</h2>
-              <p className="text-text-secondary leading-relaxed mb-6 flex-grow">
-                Terapis profesional kami datang langsung ke rumah Anda. Solusi praktis bagi orang tua yang sibuk, serta memberikan keuntungan bagi anak untuk belajar dan beradaptasi langsung di lingkungan sehari-harinya.
-              </p>
-              <ul className="space-y-2 mb-8 w-full">
-                {["Radius layanan hingga 10 km", "Terapis membawa alat pendukung", "Protokol ketat setara on-site"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" /> {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            
-            {/* Pilar 3 */}
-            <motion.div 
-              className="bg-white p-8 rounded-3xl border border-primary/10 shadow-lg shadow-primary/5 flex flex-col items-start"
-              {...fadeUp}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="w-16 h-16 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-6">
-                <Stethoscope size={32} />
-              </div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary mb-4">Konsultasi Psikolog</h2>
-              <p className="text-text-secondary leading-relaxed mb-6 flex-grow">
-                Layanan profesional untuk membantu orang tua memahami dan mendukung perkembangan emosional, perilaku, dan kemampuan anak sesuai tahap usianya.
-              </p>
-              <ul className="space-y-2 mb-8 w-full">
-                {["Psikolog berpengalaman", "Konseling orang tua bertahap", "Pendekatan holistik (growth companion)"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" /> {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            {/* Pilar 4 */}
-            <motion.div 
-              className="bg-white p-8 rounded-3xl border border-primary/10 shadow-lg shadow-primary/5 flex flex-col items-start"
-              {...fadeUp}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="w-16 h-16 rounded-2xl bg-yellow/20 text-yellow flex items-center justify-center mb-6">
-                <ClipboardCheck size={32} />
-              </div>
-              <h2 className="text-2xl font-heading font-bold text-text-primary mb-4">Psikotes & Asesmen</h2>
-              <p className="text-text-secondary leading-relaxed mb-6 flex-grow">
-                Evaluasi mendalam untuk mengukur kematangan perkembangan anak. Merupakan langkah awal penting sebelum penentuan program terapi yang tepat sasaran.
-              </p>
-              <ul className="space-y-2 mb-8 w-full">
-                {["Tes IQ & Evaluasi Perkembangan", "Tes Kesiapan Sekolah", "Tes Penegakan Diagnosa"].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-text-primary font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-primary" /> {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          </div>
-
-          {/* Detailed Therapies */}
-          <motion.div 
-            className="text-center max-w-2xl mx-auto mb-12"
-            {...fadeUp}
-          >
-            <h2 className="text-3xl font-heading font-bold text-text-primary mb-4">
-              4 Jenis Terapi Pilihan
-            </h2>
-            <p className="text-text-secondary">
-              Layanan terapi kami tersedia baik di klinik (on-site) maupun melalui kunjungan ke rumah (home visit).
+      {/* 4 Jenis Terapi */}
+      <section className="bg-white py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div className="text-center mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Jenis Terapi</p>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold">4 Terapi Komprehensif</h2>
+            <p className="text-text-secondary mt-3 max-w-2xl mx-auto">
+              Terapi anak yang kami sediakan disesuaikan dengan kebutuhan individu setiap anak.
             </p>
           </motion.div>
 
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="whileInView"
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
           >
-            {therapies.map((therapy, i) => (
-              <motion.div 
-                key={i}
+            {THERAPIES.map((t) => (
+              <motion.div
+                key={t.code}
                 variants={fadeUp}
-                className={`bg-white p-6 rounded-3xl border ${therapy.borderColor} shadow-sm hover:shadow-md transition-shadow flex flex-col`}
+                className="bg-background rounded-2xl p-6 border border-primary/10 flex flex-col"
               >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${therapy.color}`}>
-                  <therapy.icon size={28} />
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                    <t.icon size={18} />
+                  </div>
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">{t.code}</span>
                 </div>
-                <h3 className="font-heading font-bold text-lg text-text-primary mb-3">{therapy.title}</h3>
-                <p className="text-text-secondary leading-relaxed text-sm flex-grow">{therapy.desc}</p>
+                <h3 className="font-heading font-bold text-lg mb-2">{t.title}</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">{t.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -201,22 +131,21 @@ export function Services() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-primary/5 border-t border-primary/10">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-heading font-bold text-text-primary mb-6">
-            Langkah Awal Menuju Kemajuan
-          </h2>
-          <p className="text-text-secondary mb-8">
-            Jadwalkan pra-assessment atau konsultasi awal dengan tim psikolog kami untuk menentukan pendekatan terapi terbaik bagi Ananda tercinta.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button size="lg" asChild className="rounded-xl shadow-md shadow-primary/20 hover:scale-105 transition-transform">
-              <Link to="/booking">Booking Sesi Sekarang</Link>
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 border border-primary/10 shadow-sm text-center">
+          <Sparkles className="mx-auto mb-3 text-primary" size={32} />
+          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-3">Siap memulai perjalanan tumbuh kembang?</h2>
+          <p className="text-text-secondary mb-6 max-w-xl mx-auto">Kunjungi klinik kami untuk konsultasi awal & asesmen.</p>
+          <div className="flex items-center justify-center gap-2 text-sm text-text-secondary mb-6">
+            <MapPin size={16} className="text-primary" />
+            <span>{CLINIC_ADDRESS}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Button asChild size="lg" className="rounded-full px-8">
+              <Link to="/booking">Info Kunjungan</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="rounded-xl border-primary text-primary hover:bg-primary/5">
-              <a href="https://wa.me/628175028099" target="_blank" rel="noopener noreferrer">
-                Hubungi via WhatsApp
-              </a>
+            <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-2">
+              <a href={CLINIC_MAPS_URL} target="_blank" rel="noopener noreferrer">Petunjuk Arah</a>
             </Button>
           </div>
         </div>

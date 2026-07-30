@@ -1,6 +1,26 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
-const supabaseUrl = 'https://vtquhqdfyirccxdzmpyr.supabase.co';
-const supabaseKey = 'sb_publishable_rV4ay28GgXdI3TgnY3jkJA_YIVVJAKS';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  // Fail fast di dev; di production build Vite akan membuang string ini.
+  // eslint-disable-next-line no-console
+  console.error(
+    "Environment variable VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY belum di-set. " +
+      "Buat file .env berdasarkan .env.example."
+  );
+}
+
+export const supabase = createClient<Database>(
+  supabaseUrl ?? "",
+  supabaseAnonKey ?? "",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  }
+);

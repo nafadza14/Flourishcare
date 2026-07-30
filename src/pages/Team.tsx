@@ -1,164 +1,139 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Award, Heart, GraduationCap } from "lucide-react";
-
-const fadeUp = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.5 }
-};
-
-const staggerContainer = {
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true },
-  transition: { staggerChildren: 0.1 }
-};
+import { GraduationCap, Award, Loader2, Users } from "lucide-react";
+import { fadeUp, stagger } from "@/lib/motion";
+import { supabase } from "@/lib/supabase";
+import type { StaffProfile } from "@/types/database";
 
 export function Team() {
-  const teamMembers = [
-    {
-      name: "Achla Himmah M.Psi., Psikolog",
-      role: "Psikolog",
-      image: "https://i.ibb.co/DPpMtgtw/Whats-App-Image-2026-04-07-at-21-44-20.jpg",
-      desc: "Lulusan Magister Profesi Psikologi UGM. Berpengalaman lebih dari 8 tahun dalam menangani kasus autisme, ADHD, dan gangguan kecemasan pada anak. Bersertifikasi dalam Play Therapy.",
-      specialties: ["Asesmen Psikologi", "Play Therapy", "Parenting Counseling"]
-    },
-    {
-      name: "Ukhtina D Anindita M.Psi., Psikolog",
-      role: "Psikolog",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=800",
-      desc: "Psikolog klinis yang berpengalaman dalam menangani isu kesehatan mental anak, remaja, maupun keluarga. Memiliki dedikasi tinggi terhadap kesejahteraan psikologis klien.",
-      specialties: ["Konseling Keluarga", "Kesehatan Mental", "Psikoterapi"]
-    },
-    {
-      name: "Rofanny Haznatu P KM.Psi., Psikolog",
-      role: "Psikolog",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
-      desc: "Berpengalaman memberikan asesmen yang komprehensif dan intervensi klinis dengan pendekatan terapeutik dan holistik bagi tumbuh kembang optimal anak.",
-      specialties: ["Asesmen Psikologi", "Intervensi Klinis", "Konseling"]
-    },
-    {
-      name: "Budi Santoso, S.Tr.Kes., OT",
-      role: "Terapis Okupasi Senior",
-      image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=800",
-      desc: "Memiliki keahlian khusus dalam Sensori Integrasi (SI) tersertifikasi. Telah membantu ratusan anak meningkatkan kemandirian aktivitas sehari-hari dan kemampuan motorik halus.",
-      specialties: ["Sensori Integrasi", "Motorik Halus", "Kemandirian (ADL)"]
-    },
-    {
-      name: "Rina Wati, A.Md.TW",
-      role: "Terapis Wicara",
-      image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800",
-      desc: "Fokus pada intervensi dini keterlambatan bicara (speech delay) dan gangguan artikulasi. Menggunakan pendekatan DIR Floortime untuk merangsang komunikasi dua arah secara natural.",
-      specialties: ["Speech Delay", "Artikulasi", "DIR Floortime"]
-    },
-    {
-      name: "Andi Pratama, S.Psi",
-      role: "Behavioral Therapist",
-      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=800",
-      desc: "Berpengalaman dalam menerapkan metode Applied Behavior Analysis (ABA) untuk memodifikasi perilaku anak dengan ASD. Sabar, tegas, dan sangat disukai oleh anak-anak.",
-      specialties: ["ABA Therapy", "Modifikasi Perilaku", "Manajemen Tantrum"]
-    }
-  ];
+  const [staff, setStaff] = useState<StaffProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("staff_profiles")
+        .select("*")
+        .eq("is_visible", true)
+        .order("display_order", { ascending: true });
+      if (cancelled) return;
+      if (!error && data) {
+        setStaff(data as StaffProfile[]);
+      }
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <section className="pt-20 pb-16 bg-primary text-white text-center rounded-b-[3rem] shadow-xl mb-16 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <motion.h1 
-            className="text-4xl md:text-5xl font-heading font-bold mb-6 text-white"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            Tim Profesional FlourishCare
-          </motion.h1>
-          <motion.p 
-            className="text-lg md:text-xl text-white/90 leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            Di balik setiap progres luar biasa anak Anda, ada tim ahli yang berdedikasi. Kami terdiri dari psikolog klinis, terapis bersertifikasi, dan tenaga medis yang bekerja dengan hati.
-          </motion.p>
+    <div className="bg-background">
+      <section className="pt-12 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Tim Kami</p>
+          <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-4">
+            Profesional yang <span className="text-primary">Berdedikasi</span>
+          </h1>
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+            Kami adalah psikolog dan terapis bersertifikasi yang siap mendampingi tumbuh kembang si kecil.
+          </p>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="container mx-auto px-4 max-w-6xl mb-24">
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { icon: ShieldCheck, title: "Lisensi Resmi", desc: "Seluruh terapis dan psikolog kami memiliki Surat Tanda Registrasi (STR) dan Izin Praktik yang aktif." },
-            { icon: Award, title: "Berpengalaman", desc: "Telah menangani ratusan kasus tumbuh kembang dengan jam terbang tinggi di bidang pediatri." },
-            { icon: Heart, title: "Pendekatan Empatis", desc: "Tidak hanya ahli secara klinis, tim kami dilatih untuk membangun bonding yang kuat dengan anak." }
-          ].map((item, i) => (
-            <motion.div 
-              key={i}
-              {...fadeUp}
-              transition={{ delay: i * 0.2 }}
-              className="bg-white p-8 rounded-3xl border border-primary/10 shadow-sm text-center flex flex-col items-center"
+      <section className="px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
+        <div className="max-w-5xl mx-auto">
+          {loading ? (
+            <div className="flex items-center justify-center py-16 text-text-secondary">
+              <Loader2 className="animate-spin mr-2" size={20} /> Memuat profil tim…
+            </div>
+          ) : staff.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              variants={stagger}
+              initial="hidden"
+              animate="visible"
             >
-              <div className="w-16 h-16 rounded-full bg-secondary/20 text-secondary flex items-center justify-center mb-6">
-                <item.icon size={32} />
-              </div>
-              <h3 className="font-heading font-bold text-xl text-text-primary mb-3">{item.title}</h3>
-              <p className="text-text-secondary">{item.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Team Grid */}
-      <section className="container mx-auto px-4 max-w-6xl">
-        <motion.div 
-          className="text-center mb-16"
-          {...fadeUp}
-        >
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-text-primary mb-4">
-            Kenalan dengan Ahli Kami
-          </h2>
-        </motion.div>
-
-        <motion.div 
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="whileInView"
-        >
-          {teamMembers.map((member, i) => (
-            <motion.div 
-              key={i}
-              variants={fadeUp}
-              className="bg-white rounded-3xl overflow-hidden border border-primary/10 shadow-lg shadow-primary/5 group"
-            >
-              <div className="aspect-square overflow-hidden relative">
-                <img 
-                  src={member.image} 
-                  alt={member.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                  <div className="flex flex-wrap gap-2">
-                    {member.specialties.map(spec => (
-                      <span key={spec} className="bg-white/20 backdrop-blur-md text-white text-xs px-3 py-1 rounded-full border border-white/30">
-                        {spec}
-                      </span>
-                    ))}
+              {staff.map((s) => (
+                <motion.article
+                  key={s.id}
+                  variants={fadeUp}
+                  className="bg-white rounded-3xl overflow-hidden border border-primary/10 shadow-sm"
+                >
+                  <div className="aspect-[4/5] bg-primary/5">
+                    {s.photo_url ? (
+                      <img
+                        src={s.photo_url}
+                        alt={`Foto ${s.title}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-text-secondary/40">
+                        <Users size={48} />
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="font-heading font-bold text-xl text-text-primary mb-1">{member.name}</h3>
-                <p className="text-primary font-medium text-sm mb-4">{member.role}</p>
-                <p className="text-text-secondary text-sm leading-relaxed">
-                  {member.desc}
-                </p>
-              </div>
+                  <div className="p-6">
+                    <h3 className="font-heading font-bold text-xl mb-1">{s.title}</h3>
+                    {s.str_number && (
+                      <p className="text-xs text-text-secondary mb-3 inline-flex items-center gap-1">
+                        <Award size={12} className="text-primary" />
+                        STR {s.str_number}
+                      </p>
+                    )}
+                    {s.bio && <p className="text-sm text-text-secondary leading-relaxed mb-4">{s.bio}</p>}
+                    {s.specialties?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {s.specialties.map((sp) => (
+                          <span
+                            key={sp}
+                            className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-medium"
+                          >
+                            {sp}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.article>
+              ))}
             </motion.div>
-          ))}
-        </motion.div>
+          )}
+        </div>
       </section>
+
+      {/* Kepercayaan */}
+      <section className="bg-white py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          {[
+            { icon: Award, title: "Lisensi Resmi", desc: "Seluruh terapis dan psikolog kami memiliki STR aktif." },
+            { icon: GraduationCap, title: "Berpengalaman", desc: "Berpengalaman menangani berbagai kasus tumbuh kembang anak." },
+            { icon: Users, title: "Empatis", desc: "Membangun kepercayaan bersama anak dan orang tua." },
+          ].map((k) => (
+            <div key={k.title} className="p-6">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <k.icon size={26} />
+              </div>
+              <h3 className="font-heading font-bold text-lg mb-1">{k.title}</h3>
+              <p className="text-sm text-text-secondary">{k.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="text-center py-12">
+      <Users className="mx-auto text-text-secondary/40 mb-3" size={40} />
+      <p className="text-text-secondary">Profil tim akan segera hadir.</p>
     </div>
   );
 }
