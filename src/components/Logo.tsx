@@ -7,9 +7,9 @@ type LogoProps = {
   alt?: string;
 };
 
-export function Logo({ className = "h-16 md:h-20 w-auto object-contain", linkTo = "/", alt = BRAND_NAME }: LogoProps) {
+export function Logo({ className = "h-12 md:h-14 w-auto object-contain", linkTo = "/", alt = BRAND_NAME }: LogoProps) {
   return (
-    <Link to={linkTo} className="flex items-center gap-2">
+    <Link to={linkTo} className="flex items-center">
       <img src={LOGO_URL} alt={alt} className={className} />
     </Link>
   );

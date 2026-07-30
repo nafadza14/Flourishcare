@@ -184,13 +184,17 @@ export function Homepage() {
       .then((data) => {
         if (cancelled) return;
         if (data && data.posts && data.posts.length > 0) {
-          setIgPosts(
-            data.posts.slice(0, 5).map((p: { id: string | number; image_large?: string; image?: string; url?: string }) => ({
+          // Filter: hanya foto/album, buang video
+          const photosOnly = (data.posts as Array<{ id: string | number; type?: string; image_large?: string; image?: string; url?: string; video?: string; video_url?: string }>)
+            .filter((p) => p.type !== "video" && !p.video && !p.video_url)
+            .filter((p) => Boolean(p.image_large || p.image))
+            .slice(0, 5)
+            .map((p) => ({
               id: p.id,
               image: p.image_large || p.image || "",
               url: p.url || SOCIAL.instagram,
-            }))
-          );
+            }));
+          setIgPosts(photosOnly.length > 0 ? photosOnly : IG_FALLBACK);
         } else {
           setIgPosts(IG_FALLBACK);
         }

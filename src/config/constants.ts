@@ -4,8 +4,8 @@
 export const BRAND_NAME = "FlourishCare.id";
 export const BRAND_TAGLINE = "Tumbuh Bersama, Flourish Sepenuhnya";
 
-// Logo (SVG lokal — transparan). File ada di /public/logo.svg
-export const LOGO_URL = "/logo.svg";
+// Logo lokal — file ada di /public/logo.png
+export const LOGO_URL = "/logo.png";
 
 // Kontak & alamat
 export const CONTACT_EMAIL = "Flourishcare.id@gmail.com";
