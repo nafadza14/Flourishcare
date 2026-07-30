@@ -1,25 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  /* Typography — Digital Wellness reference */
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-accent: "Reenie Beanie", cursive;
 
-  --color-primary: #F29935;
+  /* Color palette — Digital Wellness reference, primary di-override ke brand FlourishCare */
+  --color-background: #FDFCF8;           /* off-white paper */
+  --color-surface: #FFFFFF;
+  --color-text-primary: #292524;         /* soft-black stone */
+  --color-text-secondary: #78716C;       /* muted stone */
+  --color-primary: #F29935;              /* BRAND coral-orange (override dari #FFB7B2) */
   --color-primary-hover: #D8852B;
-  --color-secondary: #F5BB3E;
-  --color-bluebell: #89C4E1;
+  --color-secondary: #F5BB3E;            /* brand yellow */
+  --color-bluebell: #89C4E1;             /* accent kept */
+  --color-sage: #E8EFE8;                 /* pastel sage */
+  --color-lavender: #EFEDF4;             /* pastel lavender */
+  --color-peach: #FFE4E1;                /* blob peach reference */
+  --color-lavender-blob: #E6E6FA;        /* blob lavender reference */
   --color-orange: #F29935;
   --color-yellow: #F5BB3E;
   --color-red: #E8212A;
-  --color-background: #FFFDE9;
-  --color-text-primary: #7A4C3D;
-  --color-text-secondary: #9A6C5D;
 
-  /* Soft warm-tinted shadow (brown, bukan hitam pekat) */
-  --shadow-warm-sm: 0 2px 8px -2px rgba(122, 76, 61, 0.06);
-  --shadow-warm: 0 4px 20px -2px rgba(122, 76, 61, 0.08);
-  --shadow-warm-lg: 0 12px 40px -6px rgba(122, 76, 61, 0.12);
+  /* Soft shadows — reference black-tint rgba(0,0,0,0.05) */
+  --shadow-warm-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  --shadow-warm: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-warm-lg: 0 12px 40px -6px rgba(0, 0, 0, 0.08);
 }
 
 @layer base {
@@ -30,9 +37,11 @@
     font-weight: 400;
     line-height: 1.6;
     letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     letter-spacing: -0.025em;
+    font-family: var(--font-heading);
   }
 }
 
@@ -49,25 +58,29 @@
   .shadow-warm-lg {
     box-shadow: var(--shadow-warm-lg);
   }
+  .bg-sage { background-color: var(--color-sage); }
+  .bg-lavender { background-color: var(--color-lavender); }
 }
 
-/* Background blobs — dipakai di hero / section besar */
+/* Background blobs — pastel from reference palette */
 .blob {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(80px);
-  opacity: 0.55;
+  filter: blur(90px);
+  opacity: 0.60;
   pointer-events: none;
   z-index: 0;
   animation: float 8s ease-in-out infinite;
 }
-.blob-peach { background: #FFE0C4; }
+.blob-peach { background: #FFE4E1; }         /* reference peach */
+.blob-lavender { background: #E6E6FA; }      /* reference lavender */
+.blob-sage { background: #E8EFE8; }          /* reference sage */
 .blob-buttercup { background: #FFF3C4; }
 .blob-mist { background: #D4EBF5; }
 
 @keyframes float {
   0%, 100% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(-14px) translateX(6px); }
+  50% { transform: translateY(-10px) translateX(4px); }
 }
 
 @keyframes scan {

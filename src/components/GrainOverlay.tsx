@@ -1,5 +1,5 @@
 // Global grain/noise overlay — mimicking paper texture.
-// Menggunakan inline SVG feTurbulence agar tidak perlu asset external.
+// Reference spec: SVG feTurbulence, mix-blend-mode overlay, opacity 0.35.
 
 const NOISE_SVG =
   "data:image/svg+xml;utf8," +
@@ -19,7 +19,7 @@ export function GrainOverlay() {
         backgroundImage: `url("${NOISE_SVG}")`,
         backgroundRepeat: "repeat",
         mixBlendMode: "overlay",
-        opacity: 0.28,
+        opacity: 0.35,
       }}
     />
   );
