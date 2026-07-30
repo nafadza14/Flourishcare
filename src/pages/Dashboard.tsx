@@ -12,8 +12,6 @@ import {
   LogOut,
   Menu,
   X,
-  Loader2,
-  Inbox,
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
@@ -74,7 +72,6 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-primary/10 flex flex-col transform transition-transform ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -124,7 +121,6 @@ export function Dashboard() {
         <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="bg-white border-b border-primary/10 px-4 md:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -174,24 +170,6 @@ function ProfileNotFoundBanner() {
       <p className="text-sm text-text-secondary">
         Akun Anda berhasil masuk, tetapi profil di tabel <code className="text-primary">profiles</code> belum dibuat. Hubungi Super Admin untuk memberikan role dan mengaktifkan akses tab.
       </p>
-    </div>
-  );
-}
-
-export function EmptyState({ title, description, icon: Icon = Inbox }: { title: string; description?: string; icon?: typeof Inbox }) {
-  return (
-    <div className="bg-white rounded-2xl border border-primary/10 p-10 text-center">
-      <Icon className="mx-auto mb-3 text-text-secondary/40" size={40} />
-      <h3 className="font-heading font-bold text-lg mb-1">{title}</h3>
-      {description && <p className="text-sm text-text-secondary max-w-md mx-auto">{description}</p>}
-    </div>
-  );
-}
-
-export function LoadingBlock({ label = "Memuat data…" }: { label?: string }) {
-  return (
-    <div className="bg-white rounded-2xl border border-primary/10 p-10 flex items-center justify-center text-text-secondary text-sm">
-      <Loader2 className="animate-spin mr-2" size={18} /> {label}
     </div>
   );
 }

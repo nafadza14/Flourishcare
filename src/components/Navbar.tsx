@@ -20,12 +20,12 @@ export function Navbar() {
   const close = () => setIsOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-primary/10">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex py-3 items-center justify-between">
-          <Logo className="h-12 md:h-16 w-auto object-contain" />
+    <header className="sticky top-3 z-50 w-full px-4 mt-3">
+      <div className="max-w-6xl mx-auto rounded-full bg-white/70 backdrop-blur-xl border border-primary/10 shadow-warm-sm">
+        <div className="flex px-4 md:px-5 py-2 items-center justify-between gap-4">
+          <Logo className="h-9 md:h-11 w-auto object-contain" />
 
-          <nav className="hidden lg:flex items-center gap-7">
+          <nav className="hidden lg:flex items-center gap-6">
             {MENU.map((m) => (
               <NavLink
                 key={m.to}
@@ -42,11 +42,11 @@ export function Navbar() {
             ))}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-3">
-            <Button variant="outline" asChild className="rounded-full px-6 border-2">
+          <div className="hidden lg:flex items-center gap-2">
+            <Button variant="ghost" asChild className="rounded-full px-5 text-text-secondary hover:text-primary">
               <Link to="/login">Login</Link>
             </Button>
-            <Button asChild className="rounded-full px-6">
+            <Button asChild className="rounded-full px-5 shadow-warm">
               <Link to="/booking">Kunjungi Klinik</Link>
             </Button>
           </div>
@@ -59,7 +59,7 @@ export function Navbar() {
               aria-controls="mobile-nav"
               className="p-2 text-text-secondary hover:text-primary transition-colors"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
@@ -69,12 +69,13 @@ export function Navbar() {
         {isOpen && (
           <motion.div
             id="mobile-nav"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-b border-primary/10 overflow-hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden max-w-6xl mx-auto mt-2 rounded-3xl bg-white/95 backdrop-blur-xl border border-primary/10 shadow-warm overflow-hidden"
           >
-            <div className="px-4 py-6 space-y-2 flex flex-col">
+            <div className="px-4 py-5 space-y-1 flex flex-col">
               {MENU.map((m) => (
                 <NavLink
                   key={m.to}
@@ -82,15 +83,17 @@ export function Navbar() {
                   end={m.to === "/"}
                   onClick={close}
                   className={({ isActive }) =>
-                    `text-base font-medium py-2 transition-colors ${
-                      isActive ? "text-primary" : "text-text-secondary hover:text-primary"
+                    `text-base font-medium py-2.5 px-3 rounded-xl transition-colors ${
+                      isActive
+                        ? "text-primary bg-primary/10"
+                        : "text-text-secondary hover:text-primary hover:bg-primary/5"
                     }`
                   }
                 >
                   {m.label}
                 </NavLink>
               ))}
-              <div className="pt-4 flex flex-col gap-3">
+              <div className="pt-3 flex flex-col gap-2 border-t border-primary/10 mt-2">
                 <Button variant="outline" asChild className="w-full rounded-full border-2">
                   <Link to="/login" onClick={close}>Login</Link>
                 </Button>

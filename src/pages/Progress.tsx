@@ -36,7 +36,7 @@ export function Progress() {
       });
       if (err) throw err;
       setStep("otp");
-    } catch (err: unknown) {
+    } catch {
       setError("Data tidak ditemukan atau layanan sedang tidak tersedia. Silakan hubungi admin klinik.");
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ export function Progress() {
       if (snapErr) throw snapErr;
       setSnapshot(snap as Snapshot);
       setStep("result");
-    } catch (err: unknown) {
+    } catch {
       setError("Kode verifikasi salah atau sudah kadaluarsa. Coba lagi.");
     } finally {
       setLoading(false);
@@ -80,15 +80,18 @@ export function Progress() {
   }
 
   return (
-    <div className="min-h-[70vh] bg-background">
-      <section className="pt-12 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[70vh] relative overflow-hidden">
+      <div className="blob blob-peach w-[380px] h-[380px] -top-16 -right-16" />
+      <div className="blob blob-mist w-[300px] h-[300px] top-40 -left-16" />
+
+      <section className="relative z-10 pt-12 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
             <FileSearch size={26} />
           </div>
           <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Progress Layanan</p>
           <h1 className="text-3xl md:text-4xl font-heading font-extrabold mb-3">
-            Pantau <span className="text-primary">Progres Anak</span> Anda
+            Pantau <span className="font-accent text-primary text-5xl md:text-6xl">progres</span> anak Anda
           </h1>
           <p className="text-text-secondary">
             Masukkan Nomor Rekam Medis (RM) dan Nama Pasien untuk melihat catatan progres terkini.
@@ -96,13 +99,13 @@ export function Progress() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 pb-20">
+      <section className="relative z-10 px-4 sm:px-6 lg:px-8 pb-20">
         <motion.div
           key={step}
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="max-w-xl mx-auto bg-white rounded-3xl p-6 md:p-8 border border-primary/10 shadow-sm"
+          className="max-w-xl mx-auto bg-white rounded-[2rem] p-6 md:p-8 border border-primary/10 shadow-warm-lg"
         >
           {step === "form" && (
             <form onSubmit={handleRequestOtp} className="space-y-4">
@@ -117,7 +120,7 @@ export function Progress() {
                   onChange={(e) => setRm(e.target.value)}
                   required
                   placeholder="Contoh: FC-RM-2607-0001"
-                  className="w-full rounded-xl border border-primary/20 bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-2xl border border-primary/20 bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
               <div>
@@ -131,13 +134,13 @@ export function Progress() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Nama lengkap anak"
-                  className="w-full rounded-xl border border-primary/20 bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-2xl border border-primary/20 bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
               {error && (
-                <div className="text-sm text-red bg-red/10 border border-red/20 rounded-xl px-4 py-3">{error}</div>
+                <div className="text-sm text-red bg-red/10 border border-red/20 rounded-2xl px-4 py-3">{error}</div>
               )}
-              <Button type="submit" className="w-full rounded-full" size="lg" disabled={loading}>
+              <Button type="submit" className="w-full rounded-full shadow-warm" size="lg" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="animate-spin mr-2" size={18} /> Memproses…
@@ -174,12 +177,12 @@ export function Progress() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 placeholder="000000"
-                className="w-full text-center text-2xl tracking-[0.5em] font-mono rounded-xl border border-primary/20 bg-background px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full text-center text-2xl tracking-[0.5em] font-mono rounded-2xl border border-primary/20 bg-background px-4 py-4 focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
               {error && (
-                <div className="text-sm text-red bg-red/10 border border-red/20 rounded-xl px-4 py-3">{error}</div>
+                <div className="text-sm text-red bg-red/10 border border-red/20 rounded-2xl px-4 py-3">{error}</div>
               )}
-              <Button type="submit" className="w-full rounded-full" size="lg" disabled={loading || otp.length !== 6}>
+              <Button type="submit" className="w-full rounded-full shadow-warm" size="lg" disabled={loading || otp.length !== 6}>
                 {loading ? (
                   <>
                     <Loader2 className="animate-spin mr-2" size={18} /> Memverifikasi…
@@ -220,7 +223,7 @@ function SnapshotView({ snapshot, onSignOut }: { snapshot: Snapshot; onSignOut: 
 
       <div className="bg-background rounded-2xl p-5 border border-primary/10">
         <p className="text-xs uppercase tracking-wider text-text-secondary mb-2">Progres Sesi</p>
-        <div className="flex items-baseline justify-between mb-2">
+        <div className="flex items-baseline justify-between mb-3">
           <p className="text-3xl font-heading font-extrabold text-primary">
             {snapshot.sessions_done}
             <span className="text-text-secondary text-lg font-medium"> / {snapshot.sessions_total || "—"}</span>
@@ -230,7 +233,10 @@ function SnapshotView({ snapshot, onSignOut }: { snapshot: Snapshot; onSignOut: 
           )}
         </div>
         <div className="h-2 rounded-full bg-primary/10 overflow-hidden">
-          <div className="h-full bg-primary" style={{ width: `${percent}%` }} />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 ease-out"
+            style={{ width: `${percent}%` }}
+          />
         </div>
       </div>
 

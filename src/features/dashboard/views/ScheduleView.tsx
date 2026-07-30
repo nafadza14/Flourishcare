@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CalendarDays } from "lucide-react";
 import { fetchUpcomingSessions } from "@/features/dashboard/queries";
 import type { SessionRow } from "@/types/database";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { useAuth } from "@/providers/AuthProvider";
 
 export function ScheduleView() {

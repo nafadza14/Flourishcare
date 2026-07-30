@@ -3,7 +3,7 @@
 @theme {
   --font-sans: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-heading: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-accent: "Poppins", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-accent: "Reenie Beanie", cursive;
 
   --color-primary: #F29935;
   --color-primary-hover: #D8852B;
@@ -15,6 +15,11 @@
   --color-background: #FFFDE9;
   --color-text-primary: #7A4C3D;
   --color-text-secondary: #9A6C5D;
+
+  /* Soft warm-tinted shadow (brown, bukan hitam pekat) */
+  --shadow-warm-sm: 0 2px 8px -2px rgba(122, 76, 61, 0.06);
+  --shadow-warm: 0 4px 20px -2px rgba(122, 76, 61, 0.08);
+  --shadow-warm-lg: 0 12px 40px -6px rgba(122, 76, 61, 0.12);
 }
 
 @layer base {
@@ -24,11 +29,55 @@
     font-family: var(--font-sans);
     font-weight: 400;
     line-height: 1.6;
+    letter-spacing: -0.01em;
   }
+  h1, h2, h3 {
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer utilities {
+  .font-accent {
+    font-family: var(--font-accent);
+  }
+  .shadow-warm {
+    box-shadow: var(--shadow-warm);
+  }
+  .shadow-warm-sm {
+    box-shadow: var(--shadow-warm-sm);
+  }
+  .shadow-warm-lg {
+    box-shadow: var(--shadow-warm-lg);
+  }
+}
+
+/* Background blobs — dipakai di hero / section besar */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+  animation: float 8s ease-in-out infinite;
+}
+.blob-peach { background: #FFE0C4; }
+.blob-buttercup { background: #FFF3C4; }
+.blob-mist { background: #D4EBF5; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-14px) translateX(6px); }
 }
 
 @keyframes scan {
   0% { top: 0; }
   50% { top: 100%; }
   100% { top: 0; }
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .blob { animation: none; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

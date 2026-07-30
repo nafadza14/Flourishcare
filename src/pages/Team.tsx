@@ -30,12 +30,15 @@ export function Team() {
   }, []);
 
   return (
-    <div className="bg-background">
-      <section className="pt-12 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
+    <div>
+      <section className="relative pt-14 pb-12 md:pt-20 md:pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="blob blob-peach w-[380px] h-[380px] -top-20 -left-20" />
+        <div className="blob blob-mist w-[320px] h-[320px] top-20 right-10" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Tim Kami</p>
           <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-4">
-            Profesional yang <span className="text-primary">Berdedikasi</span>
+            Profesional yang <span className="font-accent text-primary text-6xl md:text-7xl">berdedikasi</span>
           </h1>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto">
             Kami adalah psikolog dan terapis bersertifikasi yang siap mendampingi tumbuh kembang si kecil.
@@ -43,7 +46,7 @@ export function Team() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
+      <section className="px-4 sm:px-6 lg:px-8 pb-20">
         <div className="max-w-5xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center py-16 text-text-secondary">
@@ -53,16 +56,19 @@ export function Team() {
             <EmptyState />
           ) : (
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10"
               variants={stagger}
               initial="hidden"
               animate="visible"
             >
-              {staff.map((s) => (
+              {staff.map((s, idx) => (
                 <motion.article
                   key={s.id}
                   variants={fadeUp}
-                  className="bg-white rounded-3xl overflow-hidden border border-primary/10 shadow-sm"
+                  style={{ rotate: idx % 2 === 0 ? -1 : 1 }}
+                  whileHover={{ rotate: 0, y: -4 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                  className="bg-white rounded-[2rem] overflow-hidden border border-primary/10 shadow-warm"
                 >
                   <div className="aspect-[4/5] bg-primary/5">
                     {s.photo_url ? (
@@ -99,6 +105,10 @@ export function Team() {
                         ))}
                       </div>
                     )}
+                    {/* Polaroid signature */}
+                    <div className="mt-5 pt-4 border-t border-primary/10">
+                      <span className="font-accent text-2xl text-text-secondary/70">— {s.title.split(" ")[0]}</span>
+                    </div>
                   </div>
                 </motion.article>
               ))}
@@ -108,14 +118,14 @@ export function Team() {
       </section>
 
       {/* Kepercayaan */}
-      <section className="bg-white py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           {[
             { icon: Award, title: "Lisensi Resmi", desc: "Seluruh terapis dan psikolog kami memiliki STR aktif." },
             { icon: GraduationCap, title: "Berpengalaman", desc: "Berpengalaman menangani berbagai kasus tumbuh kembang anak." },
             { icon: Users, title: "Empatis", desc: "Membangun kepercayaan bersama anak dan orang tua." },
           ].map((k) => (
-            <div key={k.title} className="p-6">
+            <div key={k.title} className="bg-white rounded-3xl p-6 border border-primary/10 shadow-warm-sm">
               <div className="w-14 h-14 mx-auto rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3">
                 <k.icon size={26} />
               </div>

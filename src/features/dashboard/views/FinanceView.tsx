@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Wallet } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { formatRupiah } from "@/features/dashboard/queries";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
 type PaymentRow = {
   id: string;

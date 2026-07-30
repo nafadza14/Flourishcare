@@ -64,7 +64,6 @@ const HOW_STEPS = [
   { step: "02", title: "Evaluasi Berkala", desc: "Kami memantau perkembangan anak dan menyesuaikan rencana terapi secara berkala." },
 ];
 
-// Fallback galeri kalau tabel gallery di Supabase kosong.
 const FALLBACK_GALLERY: GalleryImage[] = [];
 
 export function Homepage() {
@@ -91,83 +90,93 @@ export function Homepage() {
   }, []);
 
   return (
-    <div className="flex flex-col w-full overflow-hidden bg-background">
+    <div className="flex flex-col w-full overflow-hidden">
       {/* Hero */}
-      <section className="pt-8 pb-16 lg:pt-16 lg:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full text-center">
-        <motion.h1
-          className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-text-primary leading-[1.1] tracking-tight mb-6 max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          Setiap Anak Berhak <span className="text-primary">Tumbuh Sepenuhnya</span>
-        </motion.h1>
+      <section className="relative pt-10 pb-16 lg:pt-20 lg:pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="blob blob-peach w-[420px] h-[420px] -top-20 -right-20" />
+        <div className="blob blob-mist w-[380px] h-[380px] top-40 -left-24" />
+        <div className="blob blob-buttercup w-[300px] h-[300px] top-1/3 left-1/2 -translate-x-1/2" />
 
-        <motion.p
-          className="text-lg sm:text-xl text-text-secondary mb-6 max-w-2xl mx-auto leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          FlourishCare menemani anak Anda tumbuh dengan pendekatan terapi profesional yang hangat dan berbasis bukti.
-        </motion.p>
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <motion.h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-text-primary leading-[1.05] mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            Setiap Anak Berhak <span className="text-primary">Tumbuh </span>
+            <span className="font-accent text-primary text-6xl sm:text-7xl lg:text-8xl leading-none">
+              Sepenuhnya
+            </span>
+          </motion.h1>
 
-        <motion.div
-          className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8 max-w-3xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-        >
-          {HERO_BADGES.map((item) => (
-            <div key={item} className="flex items-center gap-2 text-sm sm:text-base font-medium text-text-primary">
-              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
-                <CheckCircle2 size={14} />
+          <motion.p
+            className="text-lg sm:text-xl text-text-secondary mb-8 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            FlourishCare menemani anak Anda tumbuh dengan pendekatan terapi profesional yang hangat dan berbasis bukti.
+          </motion.p>
+
+          <motion.div
+            className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            {HERO_BADGES.map((item) => (
+              <div key={item} className="flex items-center gap-2 text-sm font-medium text-text-primary bg-white/70 backdrop-blur rounded-full px-4 py-2 border border-primary/10 shadow-warm-sm">
+                <CheckCircle2 size={14} className="text-primary flex-shrink-0" />
+                {item}
               </div>
-              {item}
-            </div>
-          ))}
-        </motion.div>
-
-        <motion.div
-          className="flex items-center justify-center gap-2 mb-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="flex text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={20} fill="currentColor" />
             ))}
-          </div>
-          <span className="text-sm text-text-secondary">Kepercayaan keluarga di Jakarta Timur</span>
-        </motion.div>
+          </motion.div>
 
-        <motion.div
-          className="flex flex-col sm:flex-row justify-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          <Button asChild size="lg" className="rounded-full px-8">
-            <Link to="/booking">Kunjungi Klinik</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-2">
-            <Link to="/progress">Cek Progress Anak</Link>
-          </Button>
-        </motion.div>
+          <motion.div
+            className="flex items-center justify-center gap-2 mb-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex text-yellow">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={18} fill="currentColor" />
+              ))}
+            </div>
+            <span className="text-sm text-text-secondary">Kepercayaan keluarga di Jakarta Timur</span>
+          </motion.div>
+
+          <motion.div
+            className="flex flex-col sm:flex-row justify-center gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <Button asChild size="lg" className="rounded-full px-8 shadow-warm">
+              <Link to="/booking">Kunjungi Klinik</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-2">
+              <Link to="/progress">Cek Progress Anak</Link>
+            </Button>
+          </motion.div>
+        </div>
       </section>
 
       {/* Nilai singkat */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full pb-16 md:pb-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
           {[
             { icon: Users, value: "Ratusan", label: "Keluarga Dipercaya" },
             { icon: Activity, value: "4", label: "Jenis Terapi Komprehensif" },
             { icon: HeartHandshake, value: "STR", label: "Terapis Bersertifikat" },
             { icon: Stethoscope, value: "1 Klinik", label: "di Jakarta Timur" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl p-5 md:p-6 border border-primary/10 shadow-sm text-center">
+            <div
+              key={s.label}
+              className="bg-white rounded-3xl p-5 md:p-6 border border-primary/10 shadow-warm text-center"
+            >
               <div className="w-11 h-11 mx-auto mb-3 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                <s.icon size={22} />
+                <s.icon size={20} />
               </div>
               <p className="text-2xl md:text-3xl font-heading font-extrabold text-text-primary">{s.value}</p>
               <p className="text-xs md:text-sm text-text-secondary mt-1">{s.label}</p>
@@ -177,15 +186,19 @@ export function Homepage() {
       </section>
 
       {/* Tantangan Anak */}
-      <section className="bg-white py-16 md:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="blob blob-buttercup w-[260px] h-[260px] top-10 right-1/4" />
+
+        <div className="relative z-10 max-w-6xl mx-auto">
           <motion.div className="text-center mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Tantangan Tumbuh Kembang</p>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold">Kami memahami perjalanan Anda</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold">
+              Kami memahami <span className="font-accent text-primary text-5xl md:text-6xl">perjalanan</span> Anda
+            </h2>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
             variants={stagger}
             initial="hidden"
             whileInView="visible"
@@ -195,9 +208,9 @@ export function Homepage() {
               <motion.div
                 key={c.title}
                 variants={fadeUp}
-                className="bg-background rounded-2xl p-6 border border-primary/10"
+                className="bg-white rounded-3xl p-6 border border-primary/10 shadow-warm-sm hover:shadow-warm transition-shadow"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
                   <c.icon size={22} />
                 </div>
                 <h3 className="font-heading font-bold text-lg mb-2">{c.title}</h3>
@@ -209,23 +222,29 @@ export function Homepage() {
       </section>
 
       {/* Layanan */}
-      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="blob blob-mist w-[300px] h-[300px] -top-10 -left-20" />
+
+        <div className="relative z-10 max-w-6xl mx-auto">
           <motion.div className="text-center mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Layanan Kami</p>
             <h2 className="text-3xl md:text-4xl font-heading font-bold">3 Pilar untuk mendampingi si kecil</h2>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 gap-5"
             variants={stagger}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
             {SERVICES.map((s) => (
-              <motion.div key={s.title} variants={fadeUp} className="bg-white rounded-2xl p-6 border border-primary/10 shadow-sm flex flex-col">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <motion.div
+                key={s.title}
+                variants={fadeUp}
+                className="bg-white rounded-3xl p-6 md:p-7 border border-primary/10 shadow-warm-sm flex flex-col hover:shadow-warm transition-shadow"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
                   <s.icon size={22} />
                 </div>
                 <h3 className="font-heading font-bold text-lg mb-2">{s.title}</h3>
@@ -243,17 +262,19 @@ export function Homepage() {
       </section>
 
       {/* Alur Layanan (ringkas) */}
-      <section className="bg-white py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <motion.div className="text-center mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Alur Layanan</p>
-            <h2 className="text-3xl md:text-4xl font-heading font-bold">Sederhana & terarah</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold">
+              Sederhana & <span className="font-accent text-primary text-5xl md:text-6xl">terarah</span>
+            </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {HOW_STEPS.map((h) => (
-              <div key={h.step} className="bg-background rounded-2xl p-6 border border-primary/10">
-                <p className="text-4xl font-heading font-extrabold text-primary/40 mb-3">{h.step}</p>
+              <div key={h.step} className="bg-white rounded-3xl p-7 border border-primary/10 shadow-warm-sm">
+                <p className="text-5xl font-heading font-extrabold text-primary/30 mb-3">{h.step}</p>
                 <h3 className="font-heading font-bold text-lg mb-2">{h.title}</h3>
                 <p className="text-sm text-text-secondary leading-relaxed">{h.desc}</p>
               </div>
@@ -263,12 +284,14 @@ export function Homepage() {
       </section>
 
       {/* Alamat Klinik */}
-      <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 border border-primary/10 shadow-sm text-center">
+      <section className="relative py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+        <div className="blob blob-peach w-[320px] h-[320px] top-10 right-10" />
+
+        <div className="relative z-10 max-w-3xl mx-auto bg-white rounded-[2.5rem] p-8 md:p-12 border border-primary/10 shadow-warm-lg text-center">
           <p className="text-primary font-semibold text-sm mb-2 tracking-wider uppercase">Kunjungi Kami</p>
           <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{CLINIC_ADDRESS.split(",")[0]}</h2>
           <p className="text-text-secondary max-w-2xl mx-auto mb-6">{CLINIC_ADDRESS}</p>
-          <Button asChild size="lg" className="rounded-full px-8">
+          <Button asChild size="lg" className="rounded-full px-8 shadow-warm">
             <a href={CLINIC_MAPS_URL} target="_blank" rel="noopener noreferrer">
               Petunjuk Arah
             </a>
@@ -276,10 +299,10 @@ export function Homepage() {
         </div>
       </section>
 
-      {/* Galeri Instagram (opsional — dari tabel gallery Supabase) */}
+      {/* Galeri Instagram (opsional) */}
       {gallery.length > 0 && (
-        <section className="pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+        <section className="pb-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <p className="text-primary font-semibold text-sm mb-1 tracking-wider uppercase">Momen di Klinik</p>
@@ -297,7 +320,7 @@ export function Homepage() {
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {gallery.map((g) => (
-                <div key={g.id} className="aspect-square rounded-xl overflow-hidden bg-primary/5">
+                <div key={g.id} className="aspect-square rounded-2xl overflow-hidden bg-primary/5 border border-primary/10">
                   <img src={g.url} alt={g.alt} loading="lazy" className="w-full h-full object-cover" />
                 </div>
               ))}

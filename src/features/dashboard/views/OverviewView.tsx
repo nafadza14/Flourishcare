@@ -3,7 +3,7 @@ import { Users, CalendarClock, Wallet, Activity } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { fetchDashboardKpis, fetchUpcomingSessions, formatRupiah } from "@/features/dashboard/queries";
 import type { SessionRow } from "@/types/database";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
 export function OverviewView() {
   const { profile, role } = useAuth();

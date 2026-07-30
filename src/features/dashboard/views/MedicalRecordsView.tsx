@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
 import { fetchChildren, fetchMedicalRecords, fetchProgressNotes } from "@/features/dashboard/queries";
 import type { Child, MedicalRecord, ProgressNote } from "@/types/database";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
 export function MedicalRecordsView() {
   const [children, setChildren] = useState<Child[]>([]);

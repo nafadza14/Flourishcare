@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ClipboardList } from "lucide-react";
 import { fetchRecentBookings } from "@/features/dashboard/queries";
 import type { Booking } from "@/types/database";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
 const STATUS_COLORS: Record<Booking["status"], string> = {
   pending_payment: "bg-yellow/10 text-yellow-700",

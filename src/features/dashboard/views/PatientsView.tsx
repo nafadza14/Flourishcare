@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Users, Search } from "lucide-react";
 import { fetchChildren } from "@/features/dashboard/queries";
 import type { Child } from "@/types/database";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
 export function PatientsView() {
   const [children, setChildren] = useState<Child[]>([]);

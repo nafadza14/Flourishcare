@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
+import { GrainOverlay } from "@/components/GrainOverlay";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -32,7 +33,7 @@ export function Login() {
       });
       if (err) throw err;
       navigate(redirect, { replace: true });
-    } catch (err) {
+    } catch {
       setError("Email atau kata sandi salah.");
     } finally {
       setLoading(false);
@@ -53,14 +54,20 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10 relative overflow-hidden">
+      <GrainOverlay />
+      <div className="blob blob-peach w-[400px] h-[400px] -top-16 -right-16" />
+      <div className="blob blob-mist w-[320px] h-[320px] -bottom-16 -left-16" />
+
+      <div className="relative z-10 w-full max-w-md">
         <div className="flex justify-center mb-6">
-          <Logo className="h-16 w-auto" />
+          <Logo className="h-14 w-auto" />
         </div>
-        <div className="bg-white rounded-3xl p-8 border border-primary/10 shadow-sm">
+        <div className="bg-white rounded-[2rem] p-8 border border-primary/10 shadow-warm-lg">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-heading font-bold">Masuk Dashboard</h1>
+            <h1 className="text-2xl font-heading font-bold">
+              Masuk <span className="font-accent text-primary text-4xl">Dashboard</span>
+            </h1>
             <p className="text-sm text-text-secondary mt-1">Hanya untuk internal FlourishCare.</p>
           </div>
 
@@ -76,7 +83,7 @@ export function Login() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-2xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
@@ -91,16 +98,16 @@ export function Login() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-2xl border border-primary/20 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="text-sm text-red bg-red/10 border border-red/20 rounded-xl px-4 py-3">{error}</div>
+              <div className="text-sm text-red bg-red/10 border border-red/20 rounded-2xl px-4 py-3">{error}</div>
             )}
 
-            <Button type="submit" className="w-full rounded-full" size="lg" disabled={loading}>
+            <Button type="submit" className="w-full rounded-full shadow-warm" size="lg" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="animate-spin mr-2" size={18} /> Memproses…

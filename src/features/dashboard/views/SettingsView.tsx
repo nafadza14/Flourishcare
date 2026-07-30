@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Building2, UserCog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { EmptyState, LoadingBlock } from "@/pages/Dashboard";
+import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import type { Branch, Profile } from "@/types/database";
 
 export function SettingsView() {
