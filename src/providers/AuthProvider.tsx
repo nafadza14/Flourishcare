@@ -14,32 +14,58 @@ type AuthState = {
 
 const AuthContext = createContext<AuthState | null>(null);
 
+// Helper: race a promise dengan timeout supaya tidak menggantung selamanya.
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
-    if (error) {
+    try {
+      const query = supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+      const { data, error } = await withTimeout(
+        query,
+        5000,
+        { data: null, error: null } as { data: Profile | null; error: null }
+      );
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.warn("Gagal mengambil profil:", (error as Error).message);
+        setProfile(null);
+        return;
+      }
+      setProfile((data as Profile | null) ?? null);
+    } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn("Gagal mengambil profil:", error.message);
+      console.warn("loadProfile error:", e);
       setProfile(null);
-      return;
     }
-    setProfile((data as Profile | null) ?? null);
   }, []);
 
   const refresh = useCallback(async () => {
-    const { data } = await supabase.auth.getSession();
-    setSession(data.session);
-    if (data.session?.user?.id) {
-      await loadProfile(data.session.user.id);
-    } else {
+    try {
+      const { data } = await withTimeout(
+        supabase.auth.getSession(),
+        4000,
+        { data: { session: null } } as { data: { session: Session | null } }
+      );
+      setSession(data.session);
+      if (data.session?.user?.id) {
+        await loadProfile(data.session.user.id);
+      } else {
+        setProfile(null);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("refresh error:", e);
+      setSession(null);
       setProfile(null);
     }
   }, [loadProfile]);
@@ -47,9 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      setLoading(true);
-      await refresh();
-      if (mounted) setLoading(false);
+      try {
+        setLoading(true);
+        await refresh();
+      } finally {
+        if (mounted) setLoading(false);
+      }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
       setSession(s);
