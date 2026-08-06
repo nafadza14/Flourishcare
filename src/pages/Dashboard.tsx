@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Video,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { Logo } from "@/components/Logo";
@@ -20,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import type { UserRole } from "@/types/database";
 import { OverviewView } from "@/features/dashboard/views/OverviewView";
 import { BookingsView } from "@/features/dashboard/views/BookingsView";
+import { OnlineBookingsView } from "@/features/dashboard/views/OnlineBookingsView";
 import { ScheduleView } from "@/features/dashboard/views/ScheduleView";
 import { PatientsView } from "@/features/dashboard/views/PatientsView";
 import { MedicalRecordsView } from "@/features/dashboard/views/MedicalRecordsView";
@@ -30,6 +32,7 @@ import { SettingsView } from "@/features/dashboard/views/SettingsView";
 type TabKey =
   | "overview"
   | "bookings"
+  | "online_bookings"
   | "schedule"
   | "patients"
   | "records"
@@ -40,6 +43,7 @@ type TabKey =
 const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard; roles: UserRole[] }> = [
   { key: "overview", label: "Overview", icon: LayoutDashboard, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
   { key: "bookings", label: "Booking", icon: ClipboardList, roles: ["super_admin", "admin_cabang"] },
+  { key: "online_bookings", label: "Booking Online", icon: Video, roles: ["super_admin", "admin_cabang", "psikolog"] },
   { key: "schedule", label: "Jadwal", icon: CalendarDays, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
   { key: "patients", label: "Pasien", icon: Users, roles: ["super_admin", "admin_cabang", "psikolog", "terapis"] },
   { key: "records", label: "Rekam Medis", icon: FileText, roles: ["super_admin", "psikolog"] },
@@ -146,6 +150,7 @@ export function Dashboard() {
             <>
               {tab === "overview" && <OverviewView />}
               {tab === "bookings" && <BookingsView />}
+              {tab === "online_bookings" && <OnlineBookingsView />}
               {tab === "schedule" && <ScheduleView />}
               {tab === "patients" && <PatientsView />}
               {tab === "records" && <MedicalRecordsView />}
