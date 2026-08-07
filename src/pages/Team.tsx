@@ -11,9 +11,9 @@ const FALLBACK_TEAM: StaffProfile[] = [
   {
     id: "fallback-achla",
     profile_id: null as unknown as string,
-    title: "Achla Himmah",
+    title: "Achla Himmah, M.Psi., Psikolog",
     slug: "achla-himmah",
-    bio: "Psikolog anak yang berfokus pada asesmen tumbuh kembang, konseling keluarga, dan pendampingan orang tua. Achla percaya bahwa setiap anak memiliki potensi unik yang dapat mekar dengan pendekatan hangat, sabar, dan berbasis bukti. Dengan pengalaman menangani beragam kasus tumbuh kembang, ia mendampingi orang tua memahami dunia si kecil dan menyusun langkah terapi yang paling sesuai untuk mereka.",
+    bio: "Psikolog anak yang berfokus pada asesmen tumbuh kembang, konseling keluarga, dan pendampingan orang tua. Achla percaya bahwa setiap anak memiliki potensi unik yang dapat mekar dengan pendekatan hangat, sabar, dan berbasis bukti.",
     photo_url: "/team/achla.jpeg",
     specialties: ["Asesmen Anak", "Konseling Keluarga", "Kesiapan Sekolah", "Parenting"],
     therapy_types: [],
@@ -25,18 +25,34 @@ const FALLBACK_TEAM: StaffProfile[] = [
     updated_at: "",
   },
   {
-    id: "fallback-rofanny",
+    id: "fallback-roffany",
     profile_id: null as unknown as string,
-    title: "Rofanny Haznatu P K",
-    slug: "rofanny-haznatu-pk",
-    bio: "Psikolog anak yang berdedikasi mendampingi anak dan orang tua di setiap tahap tumbuh kembang. Rofanny berpengalaman dalam asesmen perkembangan, konseling anak, serta membantu keluarga menyusun strategi intervensi yang selaras dengan kebutuhan si kecil. Ia percaya bahwa kolaborasi antara psikolog, terapis, dan orang tua adalah kunci keberhasilan program terapi anak.",
-    photo_url: "/team/rofanny.jpeg",
+    title: "Roffany Hasnatu P K, M.Psi., Psikolog",
+    slug: "roffany-hasnatu-p-k",
+    bio: "Psikolog anak yang berdedikasi mendampingi anak dan orang tua di setiap tahap tumbuh kembang. Roffany berpengalaman dalam asesmen perkembangan, konseling anak, serta membantu keluarga menyusun strategi intervensi yang selaras dengan kebutuhan si kecil.",
+    photo_url: "/team/roffany.jpeg",
     specialties: ["Asesmen Perkembangan", "Konseling Anak", "Intervensi Terapi", "Kolaborasi Keluarga"],
     therapy_types: [],
     str_number: null,
     str_expires_at: null,
     is_visible: true,
     display_order: 2,
+    created_at: "",
+    updated_at: "",
+  },
+  {
+    id: "fallback-putri",
+    profile_id: null as unknown as string,
+    title: "Putri Solihah, Terapis Anak",
+    slug: "putri-solihah",
+    bio: "Terapis anak yang berpengalaman dalam berbagai jenis terapi tumbuh kembang. Putri mendampingi anak-anak dalam sesi terapi on-site di Klinik Mitra Diani dengan pendekatan yang hangat dan menyenangkan.",
+    photo_url: null,
+    specialties: ["Terapi Wicara", "Sensori Integrasi", "Okupasi Terapi"],
+    therapy_types: [],
+    str_number: null,
+    str_expires_at: null,
+    is_visible: true,
+    display_order: 3,
     created_at: "",
     updated_at: "",
   },
@@ -98,7 +114,7 @@ export function Team() {
             </div>
           ) : (
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10"
+              className={`grid grid-cols-1 gap-8 md:gap-10 ${staff.length >= 3 ? "md:grid-cols-3" : "md:grid-cols-2"}`}
               variants={stagger}
               initial="hidden"
               animate="visible"
@@ -127,7 +143,9 @@ export function Team() {
                     )}
                   </div>
                   <div className="p-6 md:p-7">
-                    <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-1">Psikolog Anak</p>
+                    <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-1">
+                      {s.title.toLowerCase().includes("terapis") ? "Terapis Anak" : "Psikolog Anak"}
+                    </p>
                     <h3 className="font-heading font-bold text-2xl mb-2">{s.title}</h3>
                     {s.str_number && (
                       <p className="text-xs text-text-secondary mb-3 inline-flex items-center gap-1">

@@ -50,6 +50,7 @@ export function StepSchedule() {
         .from("staff_profiles")
         .select("id,title,slug,photo_url")
         .eq("is_visible", true)
+        .eq("is_bookable_online", true)
         .order("display_order");
       if (cancelled) return;
       const list = (rows ?? []) as Psi[];
