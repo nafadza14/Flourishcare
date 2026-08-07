@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Building2, UserCog, Wallet, Calendar as CalendarIcon, Loader2, Plus, Trash2, Save } from "lucide-react";
+import { Building2, UserCog, Wallet, Calendar as CalendarIcon, Loader2, Plus, Trash2, Save, UserPlus, Mail, Lock, Phone, Copy, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
-import type { Branch, Profile } from "@/types/database";
+import type { Branch, Profile, UserRole } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -72,6 +72,9 @@ export function SettingsView() {
           </ul>
         )}
       </section>
+
+      {/* Buat Akun Staf Baru — hanya super_admin */}
+      <CreateStaffSection branches={branches} onCreated={() => window.location.reload()} />
 
       {/* Pengguna */}
       <section className="bg-white rounded-2xl border border-black/5 p-5">
@@ -432,6 +435,218 @@ function SchedulesSection() {
           )}
         </>
       )}
+    </section>
+  );
+}
+
+// ============ Buat Akun Staf ============
+
+function CreateStaffSection({ branches, onCreated }: { branches: Branch[]; onCreated: () => void }) {
+  const { role } = useAuth();
+  const isSuperAdmin = role === "super_admin";
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [staffRole, setStaffRole] = useState<UserRole>("psikolog");
+  const [branchId, setBranchId] = useState<string>(branches[0]?.id ?? "");
+  const [submitting, setSubmitting] = useState(false);
+  const [msg, setMsg] = useState<{ text: string; kind: "success" | "error" } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!branchId && branches[0]) setBranchId(branches[0].id);
+  }, [branches, branchId]);
+
+  if (!isSuperAdmin) return null;
+
+  function generatePassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    let pw = "";
+    for (let i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    setPassword(pw);
+  }
+
+  async function copyCredentials() {
+    const text = `Email: ${email}\nPassword: ${password}\nRole: ${staffRole}\n\nLogin di: https://flourishcare.id/login`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setMsg(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("create_staff_user", {
+        body: {
+          email: email.trim(),
+          password,
+          full_name: fullName.trim(),
+          phone: phone.trim() || null,
+          role: staffRole,
+          branch_id: branchId || null,
+        },
+      });
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      setMsg({
+        text: `Akun ${email} berhasil dibuat sebagai ${staffRole}. Salin credentials di bawah dan kirim ke yang bersangkutan.`,
+        kind: "success",
+      });
+      onCreated();
+    } catch (err) {
+      setMsg({ text: (err as Error).message ?? "Gagal membuat akun.", kind: "error" });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-2xl border border-black/5 p-5">
+      <h3 className="font-heading font-bold flex items-center gap-2 mb-1">
+        <UserPlus size={18} className="text-primary" /> Buat Akun Staf Klinik
+      </h3>
+      <p className="text-xs text-text-secondary mb-4">
+        Buat akun untuk admin cabang, psikolog, terapis, atau karyawan. Akun langsung aktif dan bisa login di{" "}
+        <span className="font-mono">flourishcare.id/login</span>.
+      </p>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Nama Lengkap</label>
+            <input
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Contoh: Sarah Putri"
+              className="w-full rounded-xl border border-black/10 bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Email</label>
+            <div className="relative">
+              <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nama@flourishcare.id"
+                className="w-full rounded-xl border border-black/10 bg-background pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Password Sementara</label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+                <input
+                  type="text"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Minimal 8 karakter"
+                  className="w-full rounded-xl border border-black/10 bg-background pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-mono"
+                />
+              </div>
+              <Button type="button" variant="outline" size="sm" onClick={generatePassword} className="rounded-full whitespace-nowrap border-2">
+                Generate
+              </Button>
+            </div>
+            <p className="text-xs text-text-secondary mt-1">Kirim ke staf, minta ganti setelah login pertama.</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Nomor WhatsApp (opsional)</label>
+            <div className="relative">
+              <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+              <input
+                type="tel"
+                inputMode="numeric"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Contoh: 081234567890"
+                className="w-full rounded-xl border border-black/10 bg-background pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Role</label>
+            <select
+              required
+              value={staffRole}
+              onChange={(e) => setStaffRole(e.target.value as UserRole)}
+              className="w-full rounded-xl border border-black/10 bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              <option value="admin_cabang">Admin Cabang / Klinik</option>
+              <option value="psikolog">Psikolog</option>
+              <option value="terapis">Terapis</option>
+              <option value="karyawan">Karyawan</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Cabang</label>
+            <select
+              required
+              value={branchId}
+              onChange={(e) => setBranchId(e.target.value)}
+              className="w-full rounded-xl border border-black/10 bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              {branches.length === 0 ? (
+                <option value="">Belum ada cabang</option>
+              ) : (
+                branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)
+              )}
+            </select>
+          </div>
+        </div>
+
+        {msg && (
+          <div
+            className={`text-sm px-4 py-3 rounded-2xl border ${
+              msg.kind === "success"
+                ? "text-green-800 bg-green-50 border-green-200"
+                : "text-red bg-red/10 border-red/20"
+            }`}
+          >
+            {msg.text}
+            {msg.kind === "success" && (
+              <div className="mt-3 pt-3 border-t border-green-200 bg-white rounded-xl p-3 font-mono text-xs space-y-0.5">
+                <p><span className="text-text-secondary">Email:</span> <span className="font-semibold">{email}</span></p>
+                <p><span className="text-text-secondary">Password:</span> <span className="font-semibold">{password}</span></p>
+                <p><span className="text-text-secondary">Role:</span> <span className="font-semibold">{staffRole}</span></p>
+                <button
+                  type="button"
+                  onClick={copyCredentials}
+                  className="mt-2 inline-flex items-center gap-1 text-primary hover:underline"
+                >
+                  {copied ? <><Check size={12} /> Tersalin</> : <><Copy size={12} /> Salin credentials</>}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex justify-end">
+          <Button type="submit" disabled={submitting || !branchId} className="rounded-full shadow-warm">
+            {submitting ? (
+              <><Loader2 className="animate-spin mr-2" size={14} /> Membuat…</>
+            ) : (
+              <><UserPlus size={14} className="mr-2" /> Buat Akun</>
+            )}
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }
