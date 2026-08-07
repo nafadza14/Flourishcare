@@ -9,9 +9,9 @@ import { fadeUp } from "@/lib/motion";
 import { useWizard } from "../wizardContext";
 import { Stepper } from "../Stepper";
 
-// Tarif dasar (bisa dipindah ke tabel `pricing` di Supabase kelak)
-const PRICE_ONLINE = 250_000;
-const PRICE_HOMECARE = 500_000;
+// Fallback tarif kalau row di `online_booking_prices` belum ada.
+const FALLBACK_PRICE_ONLINE = 225_000;
+const FALLBACK_PRICE_HOMECARE = 225_000;
 
 export function StepPayment() {
   const navigate = useNavigate();
@@ -20,6 +20,10 @@ export function StepPayment() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prices, setPrices] = useState<{ online: number; homecare: number }>({
+    online: FALLBACK_PRICE_ONLINE,
+    homecare: FALLBACK_PRICE_HOMECARE,
+  });
 
   useEffect(() => {
     if (!data.scheduled_date || !data.scheduled_time || !data.psychologist_id) {
@@ -27,7 +31,25 @@ export function StepPayment() {
     }
   }, [data, navigate]);
 
-  const basePrice = data.mode === "homecare" ? PRICE_HOMECARE : PRICE_ONLINE;
+  // Fetch harga dinamis dari `online_booking_prices`
+  useEffect(() => {
+    (async () => {
+      const { data: rows } = await supabase
+        .from("online_booking_prices")
+        .select("mode,price");
+      if (!rows) return;
+      const map: { online: number; homecare: number } = {
+        online: FALLBACK_PRICE_ONLINE,
+        homecare: FALLBACK_PRICE_HOMECARE,
+      };
+      for (const r of rows as Array<{ mode: "online" | "homecare"; price: number }>) {
+        map[r.mode] = Number(r.price);
+      }
+      setPrices(map);
+    })();
+  }, []);
+
+  const basePrice = data.mode === "homecare" ? prices.homecare : prices.online;
   const totalToPay = data.payment_type === "dp_50" ? Math.round(basePrice / 2) : basePrice;
 
   async function handleConfirm() {
