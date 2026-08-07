@@ -77,7 +77,8 @@ export function StepSchedule() {
     })();
   }, [data.psychologist_id]);
 
-  // Ambil slot ketika tanggal dipilih
+  // Ambil slot ketika tanggal dipilih.
+  // Coba RPC dulu; kalau gagal / kosong, fallback ke generate client-side dari schedule.
   useEffect(() => {
     if (!data.psychologist_id || !data.scheduled_date) {
       setSlots([]);
@@ -85,12 +86,66 @@ export function StepSchedule() {
     }
     (async () => {
       setLoadingSlots(true);
-      const { data: rows, error } = await supabase.rpc("online_available_slots", {
-        p_staff_id: data.psychologist_id,
-        p_date: data.scheduled_date,
-      });
-      if (!error) setSlots((rows ?? []) as Slot[]);
-      setLoadingSlots(false);
+      try {
+        const { data: rows, error } = await supabase.rpc("online_available_slots", {
+          p_staff_id: data.psychologist_id,
+          p_date: data.scheduled_date,
+        });
+        if (!error && rows && (rows as Slot[]).length > 0) {
+          setSlots(rows as Slot[]);
+          return;
+        }
+        // Fallback: generate manual dari psychologist_schedules
+        const dow = new Date(data.scheduled_date + "T00:00:00").getDay();
+        const { data: schedRows } = await supabase
+          .from("psychologist_schedules")
+          .select("start_time,end_time,session_duration_min")
+          .eq("staff_id", data.psychologist_id)
+          .eq("day_of_week", dow)
+          .eq("is_active", true);
+
+        const generated: Slot[] = [];
+        for (const s of schedRows ?? []) {
+          const dur = s.session_duration_min as number;
+          const [sh, sm] = (s.start_time as string).split(":").map(Number);
+          const [eh, em] = (s.end_time as string).split(":").map(Number);
+          const startMin = sh * 60 + sm;
+          const endMin = eh * 60 + em;
+          for (let t = startMin; t + dur <= endMin; t += dur) {
+            const h = Math.floor(t / 60);
+            const m = t % 60;
+            generated.push({
+              slot_time: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`,
+              is_available: true,
+            });
+          }
+        }
+
+        // Filter slot yang sudah di-book (best-effort — hanya kelihatan booking milik user + admin, tapi cukup untuk UX)
+        const { data: bookedRows } = await supabase
+          .from("online_bookings")
+          .select("scheduled_at")
+          .eq("psychologist_id", data.psychologist_id)
+          .gte("scheduled_at", `${data.scheduled_date}T00:00:00`)
+          .lt("scheduled_at", `${data.scheduled_date}T23:59:59`)
+          .not("status", "in", "(cancelled,expired)");
+
+        const bookedTimes = new Set(
+          (bookedRows ?? []).map((b) => {
+            const d = new Date(b.scheduled_at as string);
+            return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:00`;
+          })
+        );
+
+        setSlots(
+          generated.map((s) => ({
+            ...s,
+            is_available: !bookedTimes.has(s.slot_time),
+          }))
+        );
+      } finally {
+        setLoadingSlots(false);
+      }
     })();
   }, [data.psychologist_id, data.scheduled_date]);
 
