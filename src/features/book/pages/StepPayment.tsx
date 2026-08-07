@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, QrCode, Wallet, Banknote, ShieldCheck, User2, Calendar as CalendarIcon, MapPin, Loader2, Home } from "lucide-react";
+import { ChevronLeft, QrCode, ShieldCheck, User2, Calendar as CalendarIcon, MapPin, Loader2, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
@@ -31,6 +31,14 @@ export function StepPayment() {
     }
   }, [data, navigate]);
 
+  // Pastikan payment_type selalu "full" karena DP sudah dihilangkan
+  useEffect(() => {
+    if (data.payment_type !== "full") {
+      update({ payment_type: "full" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Fetch harga dinamis dari `online_booking_prices`
   useEffect(() => {
     (async () => {
@@ -50,7 +58,7 @@ export function StepPayment() {
   }, []);
 
   const basePrice = data.mode === "homecare" ? prices.homecare : prices.online;
-  const totalToPay = data.payment_type === "dp_50" ? Math.round(basePrice / 2) : basePrice;
+  const totalToPay = basePrice; // Selalu bayar penuh
 
   async function handleConfirm() {
     if (!session) return;
@@ -77,7 +85,7 @@ export function StepPayment() {
           duration_min: 60,
           homecare_address: data.mode === "homecare" ? data.homecare_address : null,
           amount: basePrice,
-          payment_type: data.payment_type,
+          payment_type: "full",
         })
         .select()
         .single();
@@ -120,7 +128,7 @@ export function StepPayment() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* KIRI: Ringkasan + tipe bayar + alamat homecare */}
+          {/* KIRI: Ringkasan + alamat homecare */}
           <div className="space-y-5">
             <div className="bg-background rounded-3xl p-5 border border-black/5">
               <p className="font-semibold text-sm mb-4 flex items-center gap-2">
@@ -170,37 +178,21 @@ export function StepPayment() {
                 />
               </div>
             )}
-
-            <div>
-              <p className="text-sm font-semibold mb-2">Pilih Tipe Pembayaran</p>
-              <div className="grid grid-cols-2 gap-3">
-                <PayTypeCard
-                  label="Bayar Penuh"
-                  amount={basePrice}
-                  active={data.payment_type === "full"}
-                  onClick={() => update({ payment_type: "full" })}
-                />
-                <PayTypeCard
-                  label="DP 50%"
-                  amount={Math.round(basePrice / 2)}
-                  active={data.payment_type === "dp_50"}
-                  onClick={() => update({ payment_type: "dp_50" })}
-                />
-              </div>
-            </div>
           </div>
 
           {/* KANAN: Metode + tombol konfirmasi */}
           <div className="bg-background rounded-3xl p-5 border border-black/5 flex flex-col">
             <p className="font-semibold text-sm mb-4">Metode Pembayaran</p>
-            <div className="space-y-3">
-              <MethodCard
-                icon={<QrCode size={18} />}
-                title="QRIS (GoPay, OVO, Dana, ShopeePay)"
-                active
-              />
-              <MethodCard icon={<Wallet size={18} />} title="Virtual Account" disabled note="Segera hadir" />
-              <MethodCard icon={<Banknote size={18} />} title="Transfer Manual" disabled note="Segera hadir" />
+            <div
+              className="flex items-center gap-3 rounded-2xl p-3 border bg-white border-primary ring-2 ring-primary/20"
+            >
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <QrCode size={18} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">QRIS</p>
+                <p className="text-xs text-text-secondary">Scan dengan aplikasi e-wallet atau mobile banking Anda</p>
+              </div>
             </div>
 
             <hr className="border-black/5 my-5" />
@@ -233,41 +225,6 @@ export function StepPayment() {
           </div>
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-function PayTypeCard({ label, amount, active, onClick }: { label: string; amount: number; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`text-left rounded-2xl p-4 border transition-colors ${
-        active ? "bg-primary/5 border-primary ring-2 ring-primary/20" : "bg-white border-black/10 hover:border-primary/40"
-      }`}
-    >
-      <p className="text-xs text-text-secondary uppercase tracking-wider mb-1">{label}</p>
-      <p className="font-heading font-bold text-lg">Rp {amount.toLocaleString("id-ID")}</p>
-    </button>
-  );
-}
-
-function MethodCard({ icon, title, active, disabled, note }: { icon: React.ReactNode; title: string; active?: boolean; disabled?: boolean; note?: string }) {
-  return (
-    <div
-      className={`flex items-center gap-3 rounded-2xl p-3 border ${
-        active
-          ? "bg-white border-primary ring-2 ring-primary/20"
-          : disabled
-          ? "bg-white/60 border-black/5 opacity-60"
-          : "bg-white border-black/10"
-      }`}
-    >
-      <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">{icon}</div>
-      <div className="flex-1">
-        <p className="text-sm font-medium">{title}</p>
-        {note && <p className="text-xs text-text-secondary">{note}</p>}
-      </div>
     </div>
   );
 }
