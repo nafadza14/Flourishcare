@@ -70,6 +70,7 @@ export function BookLogin() {
             <div className="relative">
               <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
               <input type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="nama@email.com"
                 className="w-full rounded-full border border-black/10 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
             </div>
           </div>
@@ -78,6 +79,7 @@ export function BookLogin() {
             <div className="relative">
               <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
               <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan kata sandi Anda"
                 className="w-full rounded-full border border-black/10 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
             </div>
           </div>

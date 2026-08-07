@@ -44,7 +44,7 @@ export function Navbar() {
 
           <div className="hidden lg:flex items-center gap-2">
             <Button variant="ghost" asChild className="rounded-full px-5 text-text-secondary hover:text-primary">
-              <Link to="/login">Login</Link>
+              <Link to="/login">Masuk</Link>
             </Button>
             <Button asChild className="rounded-full px-5 shadow-warm">
               <Link to="/booking">Kunjungi Klinik</Link>
@@ -95,7 +95,7 @@ export function Navbar() {
               ))}
               <div className="pt-3 flex flex-col gap-2 border-t border-primary/10 mt-2">
                 <Button variant="outline" asChild className="w-full rounded-full border-2">
-                  <Link to="/login" onClick={close}>Login</Link>
+                  <Link to="/login" onClick={close}>Masuk</Link>
                 </Button>
                 <Button asChild className="w-full rounded-full">
                   <Link to="/booking" onClick={close}>Kunjungi Klinik</Link>

@@ -115,6 +115,7 @@ export function BookSignUp() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="nama@email.com"
                 className="w-full rounded-full border border-black/10 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
@@ -130,10 +131,11 @@ export function BookSignUp() {
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimal 6 karakter"
                 className="w-full rounded-full border border-black/10 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
-            <p className="text-xs text-text-secondary mt-1">Minimal 6 karakter.</p>
+            <p className="text-xs text-text-secondary mt-1">Kombinasikan huruf & angka untuk keamanan.</p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1.5">Nomor WhatsApp Aktif</label>
@@ -145,11 +147,11 @@ export function BookSignUp() {
                 inputMode="numeric"
                 value={wa}
                 onChange={(e) => setWa(e.target.value)}
-                placeholder="08xxxxxxxxxx"
+                placeholder="Contoh: 081234567890"
                 className="w-full rounded-full border border-black/10 bg-background pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
-            <p className="text-xs text-text-secondary mt-1">Konfirmasi booking akan dikirim via WA.</p>
+            <p className="text-xs text-text-secondary mt-1">Konfirmasi booking dan reminder sesi dikirim via WA.</p>
           </div>
 
           {error && (

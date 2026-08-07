@@ -8,6 +8,7 @@ import { About } from "./pages/About";
 import { Progress } from "./pages/Progress";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
+import { PatientPortal } from "./pages/PatientPortal";
 import { NotFound } from "./pages/NotFound";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -24,7 +25,6 @@ export default function App() {
             <Route path="team" element={<Team />} />
             <Route path="about" element={<About />} />
             <Route path="progress" element={<Progress />} />
-            {/* Redirect halaman lama */}
             <Route path="pricing" element={<Navigate to="/services" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
@@ -34,6 +34,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/portal"
+            element={
+              <ProtectedRoute>
+                <PatientPortal />
               </ProtectedRoute>
             }
           />
