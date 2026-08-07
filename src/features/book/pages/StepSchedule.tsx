@@ -157,14 +157,24 @@ export function StepSchedule() {
   }
 
   function selectDate(d: Date) {
-    if (!isDayAvailable(d)) return;
-    const iso = d.toISOString().slice(0, 10);
-    update({ scheduled_date: iso, scheduled_time: "" });
+    if (!isDayClickable(d)) return;
+    // Format YYYY-MM-DD lokal (bukan toISOString yang UTC — bisa geser 1 hari untuk zona +7)
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    update({ scheduled_date: `${y}-${m}-${day}`, scheduled_time: "" });
   }
 
-  function isDayAvailable(d: Date): boolean {
+  // Tanggal bisa diklik selama masa depan & dalam bulan yang sama.
+  // Kalau psikolog tidak punya jadwal di hari itu, slot akan kosong dan user melihat pesan "Tidak ada slot".
+  function isDayClickable(d: Date): boolean {
     if (d.getMonth() !== monthCursor.getMonth()) return false;
     if (d < startOfToday()) return false;
+    return true;
+  }
+
+  // Indicator: apakah hari ini ada jadwal terjadwal (untuk highlight visual)
+  function hasSchedule(d: Date): boolean {
     return scheduledDays.includes(d.getDay());
   }
 
@@ -260,31 +270,39 @@ export function StepSchedule() {
             <div className="grid grid-cols-7 gap-1">
               {monthMatrix.map((d, i) => {
                 const inMonth = d.getMonth() === monthCursor.getMonth();
-                const available = inMonth && isDayAvailable(d);
-                const selected = data.scheduled_date === d.toISOString().slice(0, 10);
+                const clickable = inMonth && isDayClickable(d);
+                const scheduled = hasSchedule(d);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                const iso = `${y}-${m}-${day}`;
+                const selected = data.scheduled_date === iso;
                 return (
                   <button
                     key={i}
                     type="button"
-                    disabled={!available}
+                    disabled={!clickable}
                     onClick={() => selectDate(d)}
-                    className={`aspect-square rounded-full text-sm font-semibold transition-colors ${
+                    className={`relative aspect-square rounded-full text-sm font-semibold transition-colors ${
                       selected
                         ? "bg-primary text-white shadow-warm"
-                        : available
+                        : clickable
                         ? "text-text-primary hover:bg-primary/10"
                         : "text-text-secondary/30 cursor-not-allowed"
                     }`}
                   >
                     {d.getDate()}
+                    {clickable && scheduled && !selected && (
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                    )}
                   </button>
                 );
               })}
             </div>
 
             <div className="flex items-center gap-2 mt-4 text-xs text-text-secondary">
-              <span className="w-2 h-2 rounded-full bg-primary" />
-              Jadwal tersedia
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              Titik = hari yang biasanya ada jadwal
             </div>
           </div>
 
