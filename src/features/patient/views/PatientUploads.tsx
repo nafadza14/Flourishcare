@@ -198,23 +198,30 @@ export function PatientUploads() {
           </label>
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="flex-1">
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-              onChange={handleUpload}
-              disabled={uploading || !selectedChild}
-              className="block w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 disabled:opacity-50"
-            />
-          </label>
-          {uploading && (
-            <span className="flex items-center text-xs text-text-secondary">
-              <Loader2 className="animate-spin mr-1" size={14} /> Mengunggah…
-            </span>
-          )}
-        </div>
-        {error && <p className="text-sm text-red mt-2">{error}</p>}
+        <label
+          htmlFor="patient-upload-input"
+          className={`block w-full cursor-pointer rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors p-6 text-center ${
+            uploading || !selectedChild ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <Upload size={32} className="mx-auto mb-2 text-primary" />
+          <p className="text-sm font-semibold text-primary mb-1">
+            {uploading ? "Mengunggah…" : "Klik untuk pilih file"}
+          </p>
+          <p className="text-xs text-text-secondary">
+            PDF, JPG, PNG, atau DOCX · maks. 20 MB
+          </p>
+          <input
+            id="patient-upload-input"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+            onChange={handleUpload}
+            disabled={uploading || !selectedChild}
+            className="hidden"
+          />
+        </label>
+
+        {error && <p className="text-sm text-red mt-3">{error}</p>}
       </div>
 
       <div className="bg-white rounded-2xl border border-black/5 p-5">

@@ -28,8 +28,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
   const currentUserIdRef = useRef<string | null>(null);
+  const loadedForUserIdRef = useRef<string | null>(null);
 
-  const loadProfile = useCallback(async (userId: string) => {
+  const loadProfile = useCallback(async (userId: string, forceReload = false) => {
+    // Kalau profile sudah ter-load untuk user ini dan tidak dipaksa reload, skip.
+    if (!forceReload && loadedForUserIdRef.current === userId) return;
     setProfileLoading(true);
     currentUserIdRef.current = userId;
     try {
@@ -56,8 +59,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (currentUserIdRef.current !== userId) return;
       setProfile(profileData);
+      loadedForUserIdRef.current = userId;
       // eslint-disable-next-line no-console
-      console.log("[AuthProvider] Profile loaded:", profileData);
+      console.log("[AuthProvider] Profile loaded:", profileData?.role ?? "none");
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("loadProfile error:", e);
@@ -76,9 +80,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       setSession(data.session);
       if (data.session?.user?.id) {
-        await loadProfile(data.session.user.id);
+        // Force reload dari tombol Retry
+        await loadProfile(data.session.user.id, true);
       } else {
         currentUserIdRef.current = null;
+        loadedForUserIdRef.current = null;
         setProfile(null);
       }
     } catch (e) {
@@ -94,32 +100,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       try {
         setLoading(true);
-        await refresh();
+        const { data } = await withTimeout(
+          supabase.auth.getSession(),
+          4000,
+          { data: { session: null } } as { data: { session: Session | null } }
+        );
+        if (!mounted) return;
+        setSession(data.session);
+        if (data.session?.user?.id) {
+          await loadProfile(data.session.user.id);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     })();
+
+    // PENTING: hanya reload profile pada event yang mengubah identitas user.
+    // TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION tidak perlu reload profile
+    // (identitas user sama, profile tidak berubah).
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, s) => {
+      // eslint-disable-next-line no-console
+      console.log("[AuthProvider] onAuthStateChange:", event, s?.user?.email);
       setSession(s);
-      if (s?.user?.id) {
-        await loadProfile(s.user.id);
-      } else {
+      if (event === "SIGNED_IN") {
+        if (s?.user?.id && loadedForUserIdRef.current !== s.user.id) {
+          await loadProfile(s.user.id);
+        }
+      } else if (event === "SIGNED_OUT") {
         currentUserIdRef.current = null;
+        loadedForUserIdRef.current = null;
         setProfile(null);
         setProfileLoading(false);
       }
-      // eslint-disable-next-line no-console
-      console.log("[AuthProvider] onAuthStateChange:", event, s?.user?.email);
+      // TOKEN_REFRESHED / USER_UPDATED / INITIAL_SESSION → jangan sentuh profile state.
     });
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
     };
-  }, [refresh, loadProfile]);
+  }, [loadProfile]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     currentUserIdRef.current = null;
+    loadedForUserIdRef.current = null;
     setSession(null);
     setProfile(null);
     setProfileLoading(false);
