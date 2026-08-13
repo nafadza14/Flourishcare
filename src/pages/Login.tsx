@@ -14,26 +14,23 @@ export function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { session, profile, loading: authLoading } = useAuth();
+  const { session, profile, loading: authLoading, profileLoading } = useAuth();
 
-  // "redirect" param dari ProtectedRoute; kalau tidak ada, otomatis pilih berdasarkan role
   const explicitRedirect = params.get("redirect");
 
-  // Setelah session terbentuk & profile ter-load, arahkan ke tempat yang tepat.
+  // Redirect otomatis kalau user sudah login (menghindari race, tunggu profileLoading selesai)
   useEffect(() => {
-    if (authLoading || !session) return;
+    if (authLoading || !session || profileLoading) return;
     if (explicitRedirect) {
       navigate(explicitRedirect, { replace: true });
       return;
     }
     if (profile) {
-      // Ada row di `profiles` → staff → dashboard admin
       navigate("/dashboard", { replace: true });
     } else {
-      // Tidak ada profile → user biasa (parent) → portal pasien
       navigate("/portal", { replace: true });
     }
-  }, [session, profile, authLoading, explicitRedirect, navigate]);
+  }, [session, profile, authLoading, profileLoading, explicitRedirect, navigate]);
 
   async function handleGoogle() {
     setLoading(true);
@@ -50,14 +47,44 @@ export function Login() {
     setError(null);
     setLoading(true);
     try {
-      const { error: err } = await supabase.auth.signInWithPassword({
+      const { data, error: err } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
       if (err) throw err;
-      // Redirect ditangani oleh useEffect di atas
-    } catch {
-      setError("Email atau kata sandi salah.");
+      const userId = data.user?.id;
+      if (!userId) throw new Error("Login gagal: user tidak ditemukan.");
+
+      // Query profile LANGSUNG di sini — tidak mengandalkan race condition dengan onAuthStateChange
+      const { data: profileRow, error: profErr } = await supabase
+        .from("profiles")
+        .select("id, role")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (explicitRedirect) {
+        navigate(explicitRedirect, { replace: true });
+        return;
+      }
+
+      if (profErr) {
+        // eslint-disable-next-line no-console
+        console.error("[Login] Profile query error:", profErr);
+      }
+
+      if (profileRow) {
+        // eslint-disable-next-line no-console
+        console.log("[Login] Profile found → dashboard, role:", (profileRow as { role?: string }).role);
+        navigate("/dashboard", { replace: true });
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("[Login] No profile row → portal pasien");
+        navigate("/portal", { replace: true });
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[Login] handleSubmit error:", err);
+      setError((err as Error).message ?? "Email atau kata sandi salah.");
     } finally {
       setLoading(false);
     }
