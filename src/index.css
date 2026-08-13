@@ -60,6 +60,21 @@
   }
   .bg-sage { background-color: var(--color-sage); }
   .bg-lavender { background-color: var(--color-lavender); }
+  .input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    background-color: white;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(242, 153, 53, 0.15);
+  }
 }
 
 /* Background blobs , pastel from reference palette */

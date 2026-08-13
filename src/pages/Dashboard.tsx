@@ -14,6 +14,9 @@ import {
   X,
   Sparkles,
   Video,
+  UserPlus,
+  Stethoscope,
+  LineChart,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { Logo } from "@/components/Logo";
@@ -28,13 +31,19 @@ import { MedicalRecordsView } from "@/features/dashboard/views/MedicalRecordsVie
 import { FinanceView } from "@/features/dashboard/views/FinanceView";
 import { AttendanceView } from "@/features/dashboard/views/AttendanceView";
 import { SettingsView } from "@/features/dashboard/views/SettingsView";
+import { RegistrationsView } from "@/features/dashboard/views/RegistrationsView";
+import { ExaminationsView } from "@/features/dashboard/views/ExaminationsView";
+import { DevelopmentReportsView } from "@/features/dashboard/views/DevelopmentReportsView";
 
 type TabKey =
   | "overview"
   | "bookings"
   | "online_bookings"
   | "schedule"
+  | "registrations"
   | "patients"
+  | "examinations"
+  | "development_reports"
   | "records"
   | "finance"
   | "attendance"
@@ -45,7 +54,10 @@ const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard; ro
   { key: "bookings", label: "Booking", icon: ClipboardList, roles: ["super_admin", "admin_cabang"] },
   { key: "online_bookings", label: "Booking Online", icon: Video, roles: ["super_admin", "admin_cabang", "psikolog"] },
   { key: "schedule", label: "Jadwal", icon: CalendarDays, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
+  { key: "registrations", label: "Pendaftaran Pasien", icon: UserPlus, roles: ["super_admin", "admin_cabang"] },
   { key: "patients", label: "Pasien", icon: Users, roles: ["super_admin", "admin_cabang", "psikolog", "terapis"] },
+  { key: "examinations", label: "Pemeriksaan (FRM-005)", icon: Stethoscope, roles: ["super_admin", "psikolog"] },
+  { key: "development_reports", label: "Laporan Perkembangan (FRM-008)", icon: LineChart, roles: ["super_admin", "psikolog", "terapis"] },
   { key: "records", label: "Rekam Medis", icon: FileText, roles: ["super_admin", "psikolog"] },
   { key: "finance", label: "Keuangan", icon: Wallet, roles: ["super_admin", "admin_cabang"] },
   { key: "attendance", label: "Presensi", icon: Fingerprint, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
@@ -152,7 +164,10 @@ export function Dashboard() {
               {tab === "bookings" && <BookingsView />}
               {tab === "online_bookings" && <OnlineBookingsView />}
               {tab === "schedule" && <ScheduleView />}
+              {tab === "registrations" && <RegistrationsView />}
               {tab === "patients" && <PatientsView />}
+              {tab === "examinations" && <ExaminationsView />}
+              {tab === "development_reports" && <DevelopmentReportsView />}
               {tab === "records" && <MedicalRecordsView />}
               {tab === "finance" && <FinanceView />}
               {tab === "attendance" && <AttendanceView />}

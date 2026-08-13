@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LayoutDashboard, CalendarClock, Wallet, ClipboardList, User2, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, CalendarClock, Wallet, ClipboardList, User2, LogOut, Menu, X, Upload } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { Logo } from "@/components/Logo";
 import { GrainOverlay } from "@/components/GrainOverlay";
@@ -10,14 +10,16 @@ import { PatientBookings } from "@/features/patient/views/PatientBookings";
 import { PatientPayments } from "@/features/patient/views/PatientPayments";
 import { PatientMedical } from "@/features/patient/views/PatientMedical";
 import { PatientProfile } from "@/features/patient/views/PatientProfile";
+import { PatientUploads } from "@/features/patient/views/PatientUploads";
 
-type TabKey = "overview" | "bookings" | "payments" | "medical" | "profile";
+type TabKey = "overview" | "bookings" | "payments" | "medical" | "uploads" | "profile";
 
 const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard }> = [
   { key: "overview", label: "Beranda", icon: LayoutDashboard },
   { key: "bookings", label: "Sesi & Kunjungan", icon: CalendarClock },
   { key: "payments", label: "Pembayaran", icon: Wallet },
   { key: "medical", label: "Catatan Progres", icon: ClipboardList },
+  { key: "uploads", label: "Unggah Rekam Medis", icon: Upload },
   { key: "profile", label: "Profil", icon: User2 },
 ];
 
@@ -111,6 +113,7 @@ export function PatientPortal() {
           {tab === "bookings" && <PatientBookings />}
           {tab === "payments" && <PatientPayments />}
           {tab === "medical" && <PatientMedical />}
+          {tab === "uploads" && <PatientUploads />}
           {tab === "profile" && <PatientProfile />}
         </main>
       </div>
