@@ -33,23 +33,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfileLoading(true);
     currentUserIdRef.current = userId;
     try {
-      const query = supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
-      const { data, error } = await withTimeout(
-        query as unknown as Promise<{ data: Profile | null; error: unknown }>,
+      // Pakai RPC SECURITY DEFINER dulu (bypass RLS). Kalau gagal, fallback ke query biasa.
+      const rpcRes = await withTimeout(
+        supabase.rpc("get_my_profile") as unknown as Promise<{ data: unknown; error: unknown }>,
         8000,
-        { data: null, error: null } as { data: Profile | null; error: unknown }
+        { data: null, error: null } as { data: unknown; error: unknown }
       );
-      // Race guard: kalau user berubah selama query, abaikan hasil
-      if (currentUserIdRef.current !== userId) return;
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.warn("Gagal mengambil profil:", (error as Error).message);
-        setProfile(null);
-        return;
+      let profileData: Profile | null = null;
+      const rpcRows = rpcRes.data as Array<Profile & { is_staff?: boolean }> | null;
+      if (rpcRows && rpcRows.length > 0) {
+        profileData = rpcRows[0];
+      } else if (rpcRes.error) {
+        // Fallback: query langsung
+        const query = supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        const { data } = await withTimeout(
+          query as unknown as Promise<{ data: Profile | null; error: unknown }>,
+          6000,
+          { data: null, error: null } as { data: Profile | null; error: unknown }
+        );
+        profileData = (data as Profile | null) ?? null;
       }
-      setProfile((data as Profile | null) ?? null);
+
+      if (currentUserIdRef.current !== userId) return;
+      setProfile(profileData);
       // eslint-disable-next-line no-console
-      console.log("[AuthProvider] Profile loaded:", data);
+      console.log("[AuthProvider] Profile loaded:", profileData);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("loadProfile error:", e);

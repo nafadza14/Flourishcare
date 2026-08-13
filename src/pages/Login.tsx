@@ -55,30 +55,41 @@ export function Login() {
       const userId = data.user?.id;
       if (!userId) throw new Error("Login gagal: user tidak ditemukan.");
 
-      // Query profile LANGSUNG di sini — tidak mengandalkan race condition dengan onAuthStateChange
-      const { data: profileRow, error: profErr } = await supabase
-        .from("profiles")
-        .select("id, role")
-        .eq("id", userId)
-        .maybeSingle();
-
       if (explicitRedirect) {
         navigate(explicitRedirect, { replace: true });
         return;
       }
 
-      if (profErr) {
-        // eslint-disable-next-line no-console
-        console.error("[Login] Profile query error:", profErr);
+      // Pakai RPC SECURITY DEFINER — bypass RLS, hasil selalu benar
+      const { data: rpcData, error: rpcErr } = await supabase.rpc("get_my_profile");
+      const rows = (rpcData as Array<{ id: string; role: string; is_staff: boolean }> | null) ?? [];
+      const isStaff = rows.length > 0 && rows[0]?.is_staff === true;
+
+      // eslint-disable-next-line no-console
+      console.log("[Login] get_my_profile:", { rows, isStaff, rpcErr });
+
+      if (rpcErr) {
+        // Kalau RPC belum ter-deploy, fallback ke query biasa
+        const { data: profileRow } = await supabase
+          .from("profiles")
+          .select("id, role")
+          .eq("id", userId)
+          .maybeSingle();
+        if (profileRow) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/portal", { replace: true });
+        }
+        return;
       }
 
-      if (profileRow) {
+      if (isStaff) {
         // eslint-disable-next-line no-console
-        console.log("[Login] Profile found → dashboard, role:", (profileRow as { role?: string }).role);
+        console.log("[Login] Staff terdeteksi → /dashboard, role:", rows[0].role);
         navigate("/dashboard", { replace: true });
       } else {
         // eslint-disable-next-line no-console
-        console.log("[Login] No profile row → portal pasien");
+        console.log("[Login] Bukan staff → /portal pasien");
         navigate("/portal", { replace: true });
       }
     } catch (err) {
