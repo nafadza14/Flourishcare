@@ -17,6 +17,8 @@ import {
   UserPlus,
   Stethoscope,
   LineChart,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { Logo } from "@/components/Logo";
@@ -56,8 +58,8 @@ const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard; ro
   { key: "schedule", label: "Jadwal", icon: CalendarDays, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
   { key: "registrations", label: "Pendaftaran Pasien", icon: UserPlus, roles: ["super_admin", "admin_cabang"] },
   { key: "patients", label: "Pasien", icon: Users, roles: ["super_admin", "admin_cabang", "psikolog", "terapis"] },
-  { key: "examinations", label: "Pemeriksaan (FRM-005)", icon: Stethoscope, roles: ["super_admin", "psikolog"] },
-  { key: "development_reports", label: "Laporan Perkembangan (FRM-008)", icon: LineChart, roles: ["super_admin", "psikolog", "terapis"] },
+  { key: "examinations", label: "Pemeriksaan", icon: Stethoscope, roles: ["super_admin", "psikolog"] },
+  { key: "development_reports", label: "Laporan Perkembangan", icon: LineChart, roles: ["super_admin", "psikolog", "terapis"] },
   { key: "records", label: "Rekam Medis", icon: FileText, roles: ["super_admin", "psikolog"] },
   { key: "finance", label: "Keuangan", icon: Wallet, roles: ["super_admin", "admin_cabang"] },
   { key: "attendance", label: "Presensi", icon: Fingerprint, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
@@ -65,7 +67,7 @@ const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard; ro
 ];
 
 export function Dashboard() {
-  const { profile, role, signOut } = useAuth();
+  const { profile, role, signOut, profileLoading, refresh } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabKey>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -82,6 +84,7 @@ export function Dashboard() {
   }, [visibleTabs, tab]);
 
   async function handleLogout() {
+    if (!confirm("Yakin ingin keluar dari dashboard?")) return;
     await signOut();
     navigate("/", { replace: true });
   }
@@ -156,8 +159,10 @@ export function Dashboard() {
         </header>
 
         <main className="flex-1 p-4 md:p-6 overflow-x-auto">
-          {!profile && role === null ? (
-            <ProfileNotFoundBanner />
+          {profileLoading ? (
+            <ProfileLoadingBlock />
+          ) : !profile ? (
+            <ProfileNotFoundBanner onRetry={refresh} onLogout={handleLogout} />
           ) : (
             <>
               {tab === "overview" && <OverviewView />}
@@ -180,15 +185,48 @@ export function Dashboard() {
   );
 }
 
-function ProfileNotFoundBanner() {
+function ProfileLoadingBlock() {
+  return (
+    <div className="max-w-2xl mx-auto bg-white rounded-2xl p-10 border border-primary/10 text-center">
+      <Loader2 className="animate-spin mx-auto mb-3 text-primary" size={26} />
+      <p className="text-sm text-text-secondary">Memuat profil Anda…</p>
+    </div>
+  );
+}
+
+function ProfileNotFoundBanner({ onRetry, onLogout }: { onRetry: () => Promise<void>; onLogout: () => Promise<void> }) {
+  const [retrying, setRetrying] = useState(false);
+  async function handleRetry() {
+    setRetrying(true);
+    try {
+      await onRetry();
+    } finally {
+      setRetrying(false);
+    }
+  }
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-2xl p-8 border border-primary/10 text-center">
       <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
         <Sparkles size={22} />
       </div>
-      <h2 className="text-xl font-heading font-bold mb-2">Selamat datang!</h2>
-      <p className="text-sm text-text-secondary">
-        Akun Anda berhasil masuk, tetapi profil di tabel <code className="text-primary">profiles</code> belum dibuat. Hubungi Super Admin untuk memberikan role dan mengaktifkan akses tab.
+      <h2 className="text-xl font-heading font-bold mb-2">Profil belum ter-load</h2>
+      <p className="text-sm text-text-secondary mb-5">
+        Sesi Anda masih aktif, tetapi data profil belum ter-load. Ini bisa terjadi karena jaringan lambat atau profil belum dibuat oleh Super Admin.
+      </p>
+      <div className="flex gap-2 justify-center flex-wrap">
+        <Button onClick={handleRetry} disabled={retrying} className="rounded-full">
+          {retrying ? (
+            <><Loader2 size={14} className="animate-spin mr-2" /> Memuat…</>
+          ) : (
+            <><RefreshCw size={14} className="mr-2" /> Coba Lagi</>
+          )}
+        </Button>
+        <Button onClick={onLogout} variant="outline" className="rounded-full border-2">
+          <LogOut size={14} className="mr-2" /> Keluar
+        </Button>
+      </div>
+      <p className="text-xs text-text-secondary mt-4">
+        Kalau berulang-ulang gagal, hubungi Super Admin untuk memastikan profil sudah dibuat di sistem.
       </p>
     </div>
   );
