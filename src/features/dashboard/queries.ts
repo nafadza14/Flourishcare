@@ -62,12 +62,33 @@ export async function fetchUpcomingSessions(staffId?: string, limit = 20) {
   return (data ?? []) as SessionRow[];
 }
 
+/**
+ * fetchChildren = SEMUA anak (termasuk yang belum punya RM, contoh: dari booking online).
+ * Dipakai untuk melihat semua data anak yang pernah masuk sistem (admin cabang).
+ */
 export async function fetchChildren(limit = 100) {
   const { data, error } = await supabase
     .from("children")
     .select("*")
     .is("deleted_at", null)
     .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as Child[];
+}
+
+/**
+ * fetchAssessedChildren = HANYA anak yang sudah mengisi form pendaftaran (assessment)
+ * dan sudah diberi Nomor RM oleh admin. Ini yang jadi "pasien resmi" klinik.
+ * Dipakai oleh dashboard psikolog & terapis (Pemeriksaan, Laporan Perkembangan, Rekam Medis).
+ */
+export async function fetchAssessedChildren(limit = 500) {
+  const { data, error } = await supabase
+    .from("children")
+    .select("*")
+    .is("deleted_at", null)
+    .not("rm_number", "is", null)
+    .order("full_name", { ascending: true })
     .limit(limit);
   if (error) throw error;
   return (data ?? []) as Child[];

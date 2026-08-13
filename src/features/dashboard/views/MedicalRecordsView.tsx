@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
-import { fetchChildren, fetchMedicalRecords, fetchProgressNotes } from "@/features/dashboard/queries";
+import { fetchAssessedChildren, fetchMedicalRecords, fetchProgressNotes } from "@/features/dashboard/queries";
 import type { Child, MedicalRecord, ProgressNote } from "@/types/database";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 
@@ -17,7 +17,7 @@ export function MedicalRecordsView() {
     (async () => {
       setLoading(true);
       try {
-        const data = await fetchChildren(200);
+        const data = await fetchAssessedChildren(200);
         if (!cancelled) {
           setChildren(data);
           if (data.length > 0) setSelected(data[0].id);
@@ -60,7 +60,13 @@ export function MedicalRecordsView() {
 
   if (loading) return <LoadingBlock />;
   if (children.length === 0)
-    return <EmptyState title="Belum ada pasien" description="Tambahkan pasien terlebih dulu untuk mulai mencatat rekam medis." icon={FileText} />;
+    return (
+      <EmptyState
+        title="Belum ada pasien dengan RM"
+        description="Rekam medis hanya untuk pasien yang sudah mengisi Form Pendaftaran dan diberi Nomor RM. Data booking online tidak muncul di sini."
+        icon={FileText}
+      />
+    );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

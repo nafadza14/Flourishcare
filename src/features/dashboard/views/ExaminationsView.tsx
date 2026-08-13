@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
-import { fetchChildren } from "@/features/dashboard/queries";
+import { fetchAssessedChildren } from "@/features/dashboard/queries";
 import type { Child } from "@/types/database";
 
 type Exam = {
@@ -59,7 +59,9 @@ export function ExaminationsView() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const data = await fetchChildren(500);
+      // Hanya anak yang sudah mengisi assessment DAN sudah diberi RM oleh admin.
+      // Anak dari booking online (belum punya RM) tidak muncul di sini.
+      const data = await fetchAssessedChildren(500);
       setChildren(data);
       if (data[0]) setSelected(data[0].id);
       setLoading(false);
@@ -80,7 +82,13 @@ export function ExaminationsView() {
 
   if (loading) return <LoadingBlock />;
   if (children.length === 0)
-    return <EmptyState title="Belum ada pasien" description="Assign RM ke pendaftaran untuk membuat data pasien." icon={FileText} />;
+    return (
+      <EmptyState
+        title="Belum ada pasien dengan RM"
+        description="Pasien di sini hanya yang sudah mengisi Form Pendaftaran (assessment.flourishcare.id) dan sudah diberi Nomor RM oleh admin di tab Pendaftaran Pasien. Data booking online tidak muncul di sini."
+        icon={FileText}
+      />
+    );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
