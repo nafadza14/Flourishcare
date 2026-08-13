@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { fetchAssessedChildren } from "@/features/dashboard/queries";
 import type { Child } from "@/types/database";
+import { printWithTitle, isoDate } from "@/lib/print";
 
 type Exam = {
   id: string;
@@ -313,7 +314,16 @@ function ExaminationDetail({ exam, child, onClose }: { exam: Exam; child: Child 
         <div className="sticky top-0 bg-white border-b border-black/5 px-6 py-4 flex items-center justify-between rounded-t-3xl print:hidden">
           <h2 className="font-heading font-bold text-lg">Laporan Pemeriksaan</h2>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => window.print()} className="rounded-full border-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                printWithTitle(
+                  `FRM-005_${child?.rm_number ?? "RM"}_${(child?.full_name ?? "").replace(/\s+/g, "-")}_${isoDate(exam.examination_date)}`
+                )
+              }
+              className="rounded-full border-2"
+            >
               <Printer size={14} className="mr-1" /> Print / PDF
             </Button>
             <Button size="sm" variant="ghost" onClick={onClose} className="rounded-full"><X size={16} /></Button>

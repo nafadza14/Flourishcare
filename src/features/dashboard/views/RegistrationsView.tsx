@@ -3,6 +3,7 @@ import { ClipboardList, Loader2, Printer, KeyRound, Check, X, Eye } from "lucide
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
+import { printWithTitle, isoDate } from "@/lib/print";
 
 type Registration = {
   id: string;
@@ -184,7 +185,8 @@ function RegCard({ r, onView, onUpdated }: { r: Registration; onView: () => void
 
 function RegistrationDetailModal({ reg, onClose }: { reg: Registration; onClose: () => void }) {
   function printDetail() {
-    window.print();
+    const safeName = (reg.patient_name ?? "pasien").replace(/\s+/g, "-");
+    printWithTitle(`FRM-007_${reg.code}_${safeName}_${isoDate(reg.submitted_at)}`);
   }
 
   return (

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { useAuth } from "@/providers/AuthProvider";
+import { printWithTitle, isoDate } from "@/lib/print";
 
 type Child = { id: string; rm_number: string; full_name: string };
 
@@ -365,7 +366,16 @@ function ReportDetail({ report, child, onClose }: { report: Report; child: Child
         <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between print:hidden">
           <h3 className="font-heading font-extrabold text-lg">Detail Laporan Perkembangan</h3>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="rounded-full" onClick={() => window.print()}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full"
+              onClick={() =>
+                printWithTitle(
+                  `FRM-008_${child?.rm_number ?? "RM"}_${(child?.full_name ?? "").replace(/\s+/g, "-")}_${isoDate(report.therapy_date)}`
+                )
+              }
+            >
               <Printer size={14} className="mr-1" /> Cetak/PDF
             </Button>
             <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-lg">
