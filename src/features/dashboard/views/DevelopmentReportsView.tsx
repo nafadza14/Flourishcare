@@ -157,6 +157,7 @@ export function DevelopmentReportsView() {
           <ReportForm
             child={child}
             defaultTherapist={profile?.full_name ?? ""}
+            therapistId={profile?.id ?? ""}
             onClose={() => setFormOpen(false)}
             onSaved={() => {
               setFormOpen(false);
@@ -173,11 +174,13 @@ export function DevelopmentReportsView() {
 function ReportForm({
   child,
   defaultTherapist,
+  therapistId,
   onClose,
   onSaved,
 }: {
   child: Child;
   defaultTherapist: string;
+  therapistId: string;
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -200,12 +203,21 @@ function ReportForm({
 
   async function submit() {
     setError(null);
+    if (!therapistId) {
+      setError("Profil terapis belum ter-load. Refresh halaman lalu coba lagi.");
+      return;
+    }
     setSaving(true);
+    const sesNum = sessionNumber ? Number(sessionNumber) : null;
+    const sesTot = totalSessions ? Number(totalSessions) : 12;
     const { error } = await supabase.from("development_reports").insert({
       child_id: child.id,
+      therapist_id: therapistId,           // WAJIB (NOT NULL) — referensi profiles(id)
       therapy_date: therapyDate,
-      session_number: sessionNumber ? Number(sessionNumber) : null,
-      total_sessions: totalSessions ? Number(totalSessions) : null,
+      session_no: sesNum,                   // kolom asli migrasi
+      session_number: sesNum,               // kolom alias (backward compat)
+      session_total: sesTot,                // kolom asli migrasi
+      total_sessions: sesTot,               // kolom alias (backward compat)
       therapist_name: therapistName,
       mood,
       energy,
