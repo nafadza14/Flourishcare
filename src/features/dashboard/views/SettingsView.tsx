@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, UserCog, Wallet, Calendar as CalendarIcon, Loader2, Plus, Trash2, Save, UserPlus, Mail, Lock, Phone, Copy, Check } from "lucide-react";
+import { Building2, UserCog, Wallet, Calendar as CalendarIcon, Loader2, Plus, Trash2, Save, UserPlus, Mail, Lock, Phone, Copy, Check, EyeOff, Eye } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import type { Branch, Profile, UserRole } from "@/types/database";
@@ -50,6 +50,9 @@ export function SettingsView() {
     <div className="space-y-6">
       {/* Harga Booking Online */}
       <PricingSection />
+
+      {/* Kelola tampilan psikolog di booking online */}
+      <BookableStaffSection />
 
       {/* Jadwal Psikolog */}
       <SchedulesSection />
@@ -647,6 +650,133 @@ function CreateStaffSection({ branches, onCreated }: { branches: Branch[]; onCre
           </Button>
         </div>
       </form>
+    </section>
+  );
+}
+
+// ============ Kelola Psikolog yang muncul di Booking Online ============
+
+type BookableStaff = {
+  id: string;
+  title: string;
+  slug: string | null;
+  photo_url: string | null;
+  is_visible: boolean;
+  is_bookable_online: boolean;
+  display_order: number | null;
+};
+
+function BookableStaffSection() {
+  const { role } = useAuth();
+  const canEdit = role === "super_admin";
+  const [staff, setStaff] = useState<BookableStaff[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    const { data } = await supabase
+      .from("staff_profiles")
+      .select("id, title, slug, photo_url, is_visible, is_bookable_online, display_order")
+      .order("display_order", { ascending: true });
+    setStaff((data as BookableStaff[]) ?? []);
+    setLoading(false);
+  }
+
+  useEffect(() => { void load(); }, []);
+
+  async function toggleBookable(id: string, next: boolean) {
+    setSavingId(id);
+    setMsg(null);
+    const { error } = await supabase
+      .from("staff_profiles")
+      .update({ is_bookable_online: next })
+      .eq("id", id);
+    setSavingId(null);
+    if (error) {
+      setMsg(`Error: ${error.message}`);
+    } else {
+      setStaff((prev) => prev.map((s) => (s.id === id ? { ...s, is_bookable_online: next } : s)));
+      setMsg(`Tersimpan. Halaman booking akan menampilkan perubahan setelah reload.`);
+    }
+  }
+
+  return (
+    <section className="bg-white rounded-2xl border border-black/5 p-5">
+      <h3 className="font-heading font-bold flex items-center gap-2 mb-1">
+        <UserCog size={18} className="text-primary" /> Kelola Psikolog di Booking Online
+      </h3>
+      <p className="text-xs text-text-secondary mb-4">
+        Atur siapa yang muncul di halaman <span className="font-mono">book.flourishcare.id</span>.
+        Nonaktifkan toggle untuk menyembunyikan psikolog dari daftar booking (tanpa menghapus data mereka).
+      </p>
+
+      {!canEdit && (
+        <p className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2 mb-3">
+          Hanya super admin yang bisa mengubah pengaturan ini.
+        </p>
+      )}
+
+      {loading ? (
+        <div className="text-sm text-text-secondary flex items-center gap-2">
+          <Loader2 className="animate-spin" size={14} /> Memuat data psikolog…
+        </div>
+      ) : staff.length === 0 ? (
+        <p className="text-sm text-text-secondary italic">Belum ada data psikolog.</p>
+      ) : (
+        <ul className="divide-y divide-black/5">
+          {staff.map((s) => (
+            <li key={s.id} className="py-3 flex items-center gap-3">
+              {s.photo_url ? (
+                <img src={s.photo_url} alt={s.title} className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm">
+                  {s.title.substring(0, 2).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{s.title}</p>
+                <p className="text-xs text-text-secondary">
+                  {s.is_visible ? "Tampil di publik" : "Disembunyikan dari halaman /team"}
+                  {" · "}
+                  {s.is_bookable_online ? (
+                    <span className="text-green-700 font-medium">Aktif di booking online</span>
+                  ) : (
+                    <span className="text-red font-medium">Tidak aktif di booking online</span>
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={!canEdit || savingId === s.id}
+                onClick={() => toggleBookable(s.id, !s.is_bookable_online)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors disabled:opacity-50 ${
+                  s.is_bookable_online
+                    ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                    : "bg-red/10 text-red border-red/20 hover:bg-red/20"
+                }`}
+              >
+                {savingId === s.id ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : s.is_bookable_online ? (
+                  <>
+                    <Eye size={12} /> Aktif
+                  </>
+                ) : (
+                  <>
+                    <EyeOff size={12} /> Nonaktif
+                  </>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {msg && (
+        <p className={`text-xs mt-3 ${msg.startsWith("Error") ? "text-red" : "text-green-700"}`}>{msg}</p>
+      )}
     </section>
   );
 }
