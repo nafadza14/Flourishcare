@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { LineChart, Loader2, Printer, Plus, Eye, X, Check } from "lucide-react";
+import { LineChart, Loader2, Printer, Plus, Eye, X, Check, Pencil } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
@@ -54,6 +54,7 @@ export function DevelopmentReportsView() {
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
+  const [editReport, setEditReport] = useState<Report | null>(null);
   const [detail, setDetail] = useState<Report | null>(null);
 
   useEffect(() => {
@@ -143,9 +144,14 @@ export function DevelopmentReportsView() {
                         Terapis: {r.therapist_name} · Mood: {r.mood ?? "-"} · Energi: {r.energy ?? "-"}
                       </p>
                     </div>
-                    <Button variant="outline" size="sm" className="rounded-full" onClick={() => setDetail(r)}>
-                      <Eye size={14} className="mr-1" /> Detail
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setDetail(r)}>
+                        <Eye size={14} className="mr-1" /> Detail
+                      </Button>
+                      <Button variant="outline" size="sm" className="rounded-full" onClick={() => setEditReport(r)}>
+                        <Pencil size={14} className="mr-1" /> Edit
+                      </Button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -165,6 +171,19 @@ export function DevelopmentReportsView() {
             }}
           />
         )}
+        {editReport && child && (
+          <ReportForm
+            child={child}
+            defaultTherapist={profile?.full_name ?? ""}
+            therapistId={profile?.id ?? ""}
+            initialReport={editReport}
+            onClose={() => setEditReport(null)}
+            onSaved={() => {
+              setEditReport(null);
+              refresh();
+            }}
+          />
+        )}
         {detail && <ReportDetail report={detail} child={child!} onClose={() => setDetail(null)} />}
       </section>
     </div>
@@ -175,26 +194,39 @@ function ReportForm({
   child,
   defaultTherapist,
   therapistId,
+  initialReport,
   onClose,
   onSaved,
 }: {
   child: Child;
   defaultTherapist: string;
   therapistId: string;
+  initialReport?: Report;
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const isEdit = Boolean(initialReport?.id);
   const [saving, setSaving] = useState(false);
-  const [therapyDate, setTherapyDate] = useState(new Date().toISOString().slice(0, 10));
-  const [sessionNumber, setSessionNumber] = useState<string>("");
-  const [totalSessions, setTotalSessions] = useState<string>("12");
-  const [therapistName, setTherapistName] = useState(defaultTherapist);
-  const [mood, setMood] = useState<Report["mood"]>("baik");
-  const [energy, setEnergy] = useState<Report["energy"]>("sedang");
-  const [activities, setActivities] = useState<Activity[]>([{ activity: "", duration: "", assistance: "", response: "" }]);
-  const [obstacles, setObstacles] = useState<string[]>([]);
-  const [homeProgram, setHomeProgram] = useState("");
-  const [notes, setNotes] = useState("");
+  const [therapyDate, setTherapyDate] = useState(
+    initialReport?.therapy_date ?? new Date().toISOString().slice(0, 10)
+  );
+  const [sessionNumber, setSessionNumber] = useState<string>(
+    String(initialReport?.session_number ?? "")
+  );
+  const [totalSessions, setTotalSessions] = useState<string>(
+    String(initialReport?.total_sessions ?? "12")
+  );
+  const [therapistName, setTherapistName] = useState(initialReport?.therapist_name ?? defaultTherapist);
+  const [mood, setMood] = useState<Report["mood"]>(initialReport?.mood ?? "baik");
+  const [energy, setEnergy] = useState<Report["energy"]>(initialReport?.energy ?? "sedang");
+  const [activities, setActivities] = useState<Activity[]>(
+    initialReport?.activities?.length
+      ? initialReport.activities
+      : [{ activity: "", duration: "", assistance: "", response: "" }]
+  );
+  const [obstacles, setObstacles] = useState<string[]>(initialReport?.obstacles ?? []);
+  const [homeProgram, setHomeProgram] = useState(initialReport?.home_program ?? "");
+  const [notes, setNotes] = useState(initialReport?.notes ?? "");
   const [error, setError] = useState<string | null>(null);
 
   function toggleObstacle(o: string) {
@@ -210,14 +242,14 @@ function ReportForm({
     setSaving(true);
     const sesNum = sessionNumber ? Number(sessionNumber) : null;
     const sesTot = totalSessions ? Number(totalSessions) : 12;
-    const { error } = await supabase.from("development_reports").insert({
+    const payload = {
       child_id: child.id,
-      therapist_id: therapistId,           // WAJIB (NOT NULL) — referensi profiles(id)
+      therapist_id: therapistId,
       therapy_date: therapyDate,
-      session_no: sesNum,                   // kolom asli migrasi
-      session_number: sesNum,               // kolom alias (backward compat)
-      session_total: sesTot,                // kolom asli migrasi
-      total_sessions: sesTot,               // kolom alias (backward compat)
+      session_no: sesNum,
+      session_number: sesNum,
+      session_total: sesTot,
+      total_sessions: sesTot,
       therapist_name: therapistName,
       mood,
       energy,
@@ -225,7 +257,18 @@ function ReportForm({
       obstacles,
       home_program: homeProgram || null,
       notes: notes || null,
-    });
+    };
+    let error;
+    if (isEdit && initialReport) {
+      const { error: e } = await supabase
+        .from("development_reports")
+        .update(payload)
+        .eq("id", initialReport.id);
+      error = e;
+    } else {
+      const { error: e } = await supabase.from("development_reports").insert(payload);
+      error = e;
+    }
     setSaving(false);
     if (error) {
       setError(error.message);
@@ -239,7 +282,7 @@ function ReportForm({
       <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
           <div>
-            <h3 className="font-heading font-extrabold text-lg">Laporan Perkembangan Baru</h3>
+            <h3 className="font-heading font-extrabold text-lg">{isEdit ? "Edit Laporan Perkembangan" : "Laporan Perkembangan Baru"}</h3>
             <p className="text-xs text-text-secondary">{child.full_name} · RM {child.rm_number}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-lg">
@@ -363,7 +406,7 @@ function ReportForm({
           </Button>
           <Button className="rounded-full" onClick={submit} disabled={saving}>
             {saving ? <Loader2 className="animate-spin mr-1" size={16} /> : <Check size={16} className="mr-1" />}
-            Simpan Laporan
+            {isEdit ? "Simpan Perubahan" : "Simpan Laporan"}
           </Button>
         </div>
       </div>

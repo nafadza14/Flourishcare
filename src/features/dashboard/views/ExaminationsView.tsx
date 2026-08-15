@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, Plus, Printer, X, Loader2, Save } from "lucide-react";
+import { FileText, Plus, Printer, X, Loader2, Save, Pencil } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ export function ExaminationsView() {
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editExam, setEditExam] = useState<Exam | null>(null);
   const [detailExam, setDetailExam] = useState<Exam | null>(null);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export function ExaminationsView() {
         .order("examination_date", { ascending: false });
       setExams((data as Exam[]) ?? []);
     })();
-  }, [selected, showForm]);
+  }, [selected, showForm, editExam]);
 
   if (loading) return <LoadingBlock />;
   if (children.length === 0)
@@ -135,9 +136,16 @@ export function ExaminationsView() {
                       </div>
                     )}
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => setDetailExam(ex)} className="rounded-full border-2">
-                    Detail
-                  </Button>
+                  <div className="flex flex-col gap-1 items-end">
+                    <Button size="sm" variant="outline" onClick={() => setDetailExam(ex)} className="rounded-full border-2">
+                      Detail
+                    </Button>
+                    {canWrite && (
+                      <Button size="sm" variant="outline" onClick={() => setEditExam(ex)} className="rounded-full border-2">
+                        <Pencil size={12} className="mr-1" /> Edit
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -153,6 +161,15 @@ export function ExaminationsView() {
           onSaved={() => setShowForm(false)}
         />
       )}
+      {editExam && (
+        <ExaminationForm
+          childId={editExam.child_id}
+          child={children.find((c) => c.id === editExam.child_id)}
+          initialExam={editExam}
+          onClose={() => setEditExam(null)}
+          onSaved={() => setEditExam(null)}
+        />
+      )}
       {detailExam && (
         <ExaminationDetail exam={detailExam} child={children.find((c) => c.id === detailExam.child_id)} onClose={() => setDetailExam(null)} />
       )}
@@ -162,28 +179,64 @@ export function ExaminationsView() {
 
 // ============ Form Create Examination ============
 
-function ExaminationForm({ childId, child, onClose, onSaved }: { childId: string; child: Child | undefined; onClose: () => void; onSaved: () => void }) {
+function ExaminationForm({
+  childId,
+  child,
+  initialExam,
+  onClose,
+  onSaved,
+}: {
+  childId: string;
+  child: Child | undefined;
+  initialExam?: Exam;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
   const { profile } = useAuth();
+  const isEdit = Boolean(initialExam?.id);
 
-  const [examDate, setExamDate] = useState(new Date().toISOString().slice(0, 10));
-  const [age, setAge] = useState("");
-  const [complaint, setComplaint] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
-  const [langAspects, setLangAspects] = useState<Record<string, string>>({ joint_attention: "", respon_panggil: "" });
-  const [langNotes, setLangNotes] = useState({ ekspresif: "", reseptif: "" });
-  const [motor, setMotor] = useState<Record<string, string>>({ motorik_kasar: "", motorik_halus: "" });
-  const [sensory, setSensory] = useState<Record<string, string>>({
-    taktil: "", visual: "", auditori: "", gustatori: "", olfactory: "",
-    proprioceptive: "", introsceptive: "", vestibular: "",
+  const [examDate, setExamDate] = useState(
+    initialExam?.examination_date ?? new Date().toISOString().slice(0, 10)
+  );
+  const [age, setAge] = useState(initialExam?.patient_age ?? "");
+  const [complaint, setComplaint] = useState(initialExam?.chief_complaint ?? "");
+  const [diagnosis, setDiagnosis] = useState(initialExam?.diagnosis ?? "");
+  const [langAspects, setLangAspects] = useState<Record<string, string>>({
+    joint_attention: (initialExam?.language_aspects?.joint_attention as string) ?? "",
+    respon_panggil: (initialExam?.language_aspects?.respon_panggil as string) ?? "",
   });
-  const [control, setControl] = useState("");
-  const [regulasi, setRegulasi] = useState("");
-  const [adaptasi, setAdaptasi] = useState("");
-  const [followUp, setFollowUp] = useState<string[]>([]);
-  const [notes, setNotes] = useState("");
-  const [subjective, setSubjective] = useState("");
-  const [objective, setObjective] = useState("");
-  const [conclusion, setConclusion] = useState("");
+  const [langNotes, setLangNotes] = useState({
+    ekspresif: (initialExam?.language_aspects?.ekspresif as string) ?? "",
+    reseptif: (initialExam?.language_aspects?.reseptif as string) ?? "",
+  });
+  const [motor, setMotor] = useState<Record<string, string>>({
+    motorik_kasar: (initialExam?.motor_aspects?.motorik_kasar as string) ?? "",
+    motorik_halus: (initialExam?.motor_aspects?.motorik_halus as string) ?? "",
+  });
+  const [sensory, setSensory] = useState<Record<string, string>>({
+    taktil: (initialExam?.sensory_aspects?.taktil as string) ?? "",
+    visual: (initialExam?.sensory_aspects?.visual as string) ?? "",
+    auditori: (initialExam?.sensory_aspects?.auditori as string) ?? "",
+    gustatori: (initialExam?.sensory_aspects?.gustatori as string) ?? "",
+    olfactory: (initialExam?.sensory_aspects?.olfactory as string) ?? "",
+    proprioceptive: (initialExam?.sensory_aspects?.proprioceptive as string) ?? "",
+    introsceptive: (initialExam?.sensory_aspects?.introsceptive as string) ?? "",
+    vestibular: (initialExam?.sensory_aspects?.vestibular as string) ?? "",
+  });
+  const [control, setControl] = useState<string>(
+    (initialExam?.other_aspects as { control_impulse?: string })?.control_impulse ?? ""
+  );
+  const [regulasi, setRegulasi] = useState<string>(
+    (initialExam?.other_aspects as { regulasi_emosi?: string })?.regulasi_emosi ?? ""
+  );
+  const [adaptasi, setAdaptasi] = useState<string>(
+    (initialExam?.other_aspects as { kemampuan_adaptasi?: string })?.kemampuan_adaptasi ?? ""
+  );
+  const [followUp, setFollowUp] = useState<string[]>(initialExam?.follow_up_plan ?? []);
+  const [notes, setNotes] = useState(initialExam?.additional_notes ?? "");
+  const [subjective, setSubjective] = useState((initialExam as { subjective_info?: string } | undefined)?.subjective_info ?? "");
+  const [objective, setObjective] = useState((initialExam as { objective_info?: string } | undefined)?.objective_info ?? "");
+  const [conclusion, setConclusion] = useState(initialExam?.conclusion ?? "");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -195,7 +248,7 @@ function ExaminationForm({ childId, child, onClose, onSaved }: { childId: string
     if (!profile) return;
     setSaving(true);
     setErr(null);
-    const { error } = await supabase.from("medical_examinations").insert({
+    const payload = {
       child_id: childId,
       examiner_id: profile.id,
       examination_date: examDate,
@@ -215,8 +268,22 @@ function ExaminationForm({ childId, child, onClose, onSaved }: { childId: string
       subjective_info: subjective || null,
       objective_info: objective || null,
       conclusion: conclusion || null,
-      signed_at: new Date().toISOString(),
-    });
+    };
+    let error;
+    if (isEdit && initialExam) {
+      // UPDATE mode: preserve created_at & examiner_id lama kalau perlu
+      const { error: e } = await supabase
+        .from("medical_examinations")
+        .update(payload)
+        .eq("id", initialExam.id);
+      error = e;
+    } else {
+      const { error: e } = await supabase.from("medical_examinations").insert({
+        ...payload,
+        signed_at: new Date().toISOString(),
+      });
+      error = e;
+    }
     setSaving(false);
     if (error) setErr(error.message);
     else onSaved();
@@ -227,7 +294,9 @@ function ExaminationForm({ childId, child, onClose, onSaved }: { childId: string
       <div className="bg-white rounded-3xl max-w-3xl w-full my-8 shadow-warm-lg">
         <div className="sticky top-0 bg-white border-b border-black/5 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <div>
-            <h2 className="font-heading font-bold text-lg">Laporan Pemeriksaan (FRM-005)</h2>
+            <h2 className="font-heading font-bold text-lg">
+              {isEdit ? "Edit Laporan Pemeriksaan" : "Laporan Pemeriksaan"} (FRM-005)
+            </h2>
             <p className="text-xs text-text-secondary">Pasien: {child?.full_name} · RM {child?.rm_number}</p>
           </div>
           <Button size="sm" variant="ghost" onClick={onClose} className="rounded-full"><X size={16} /></Button>
@@ -296,7 +365,7 @@ function ExaminationForm({ childId, child, onClose, onSaved }: { childId: string
           <div className="flex justify-end gap-2 pt-4 border-t border-black/5">
             <Button variant="outline" onClick={onClose} className="rounded-full border-2">Batal</Button>
             <Button onClick={save} disabled={saving} className="rounded-full shadow-warm">
-              {saving ? <><Loader2 className="animate-spin mr-2" size={14} /> Menyimpan…</> : <><Save size={14} className="mr-2" /> Simpan Laporan</>}
+              {saving ? <><Loader2 className="animate-spin mr-2" size={14} /> Menyimpan…</> : <><Save size={14} className="mr-2" /> {isEdit ? "Simpan Perubahan" : "Simpan Laporan"}</>}
             </Button>
           </div>
         </div>
