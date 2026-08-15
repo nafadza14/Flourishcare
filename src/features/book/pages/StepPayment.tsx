@@ -14,9 +14,18 @@ const FALLBACK_PRICE_ONLINE = 200_000;
 const FALLBACK_PRICE_HOMECARE = 200_000;
 const FALLBACK_ADMIN_FEE = 25_000;
 
+// Format tanggal ke DD/MM/YYYY + hari (bahasa Indonesia)
+function formatDateID(d: Date): string {
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  const weekday = d.toLocaleDateString("id-ID", { weekday: "long" });
+  return `${weekday}, ${day}/${month}/${year}`;
+}
+
 export function StepPayment() {
   const navigate = useNavigate();
-  const { data, update, reset } = useWizard();
+  const { data, update } = useWizard();
   const { session } = useAuth();
 
   const [submitting, setSubmitting] = useState(false);
@@ -103,8 +112,9 @@ export function StepPayment() {
         throw new Error(payErr?.message ?? "Gagal membuat link pembayaran");
       }
 
-      // Reset wizard & redirect ke Sumopod
-      reset();
+      // PENTING: JANGAN reset wizard di sini. Data tetap tersimpan di localStorage
+      // supaya kalau user klik Back dari Sumopod, form-nya masih terisi.
+      // Reset baru dilakukan di halaman /success setelah payment confirmed.
       window.location.href = payRes.payment_url;
     } catch (e) {
       setError((e as Error).message);
@@ -154,7 +164,7 @@ export function StepPayment() {
                   <div>
                     <p className="text-xs text-text-secondary">Waktu</p>
                     <p className="font-semibold">
-                      {scheduledDate?.toLocaleDateString("id-ID", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
+                      {scheduledDate ? formatDateID(scheduledDate) : "-"}
                     </p>
                     <p className="text-xs text-primary">{data.scheduled_time} WIB</p>
                   </div>

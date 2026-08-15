@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "./providers/AuthProvider";
+import { supabase } from "./lib/supabase";
 import { BookLayout } from "./features/book/BookLayout";
 import { BookSignUp } from "./features/book/pages/BookSignUp";
 import { BookLogin } from "./features/book/pages/BookLogin";
@@ -10,17 +12,45 @@ import { StepPayment } from "./features/book/pages/StepPayment";
 import { BookSuccess } from "./features/book/pages/BookSuccess";
 import { BookCancel } from "./features/book/pages/BookCancel";
 import { BookWizardProvider } from "./features/book/wizardContext";
+import { Loader2 } from "lucide-react";
 
+/**
+ * Halaman yang menangani OAuth callback (?code=...) — Supabase JS dengan
+ * detectSessionInUrl:true otomatis exchange, tapi kadang butuh eksplisit
+ * exchangeCodeForSession untuk lebih pasti. Sekaligus tampilkan loading state
+ * yang jelas biar user tidak merasa "hang".
+ */
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { loading, session } = useAuth();
-  if (loading) {
+  const location = useLocation();
+  const [exchanging, setExchanging] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get("code");
+    if (code && !session && !exchanging) {
+      setExchanging(true);
+      // Force-exchange kalau Supabase belum sempat process (defensif).
+      supabase.auth.exchangeCodeForSession(code).finally(() => {
+        setExchanging(false);
+      });
+    }
+  }, [location.search, session, exchanging]);
+
+  if (loading || exchanging) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-text-secondary text-sm">Memuat sesi…</div>
+        <div className="text-center">
+          <Loader2 className="animate-spin text-primary mx-auto mb-3" size={28} />
+          <p className="text-text-secondary text-sm">Memuat sesi Anda…</p>
+        </div>
       </div>
     );
   }
-  if (!session) return <Navigate to="/signup" replace />;
+  if (!session) {
+    const next = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/signup?next=${next}`} replace />;
+  }
   return <>{children}</>;
 }
 

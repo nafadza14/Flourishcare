@@ -13,7 +13,6 @@ export type ConsultationTopic =
   | "lainnya";
 
 export type WizardData = {
-  // Step 1: Profil
   parent_name: string;
   parent_whatsapp: string;
   parent_email: string;
@@ -23,7 +22,6 @@ export type WizardData = {
   consultation_topic: ConsultationTopic | "";
   condition_notes: string;
 
-  // Step 2: Jadwal
   mode: "online" | "homecare";
   psychologist_id: string;
   psychologist_name: string;
@@ -31,7 +29,6 @@ export type WizardData = {
   scheduled_time: string;
   homecare_address: string;
 
-  // Step 3: Payment
   payment_type: "full" | "dp_50";
 };
 
@@ -61,12 +58,14 @@ type Ctx = {
 
 const WizardCtx = createContext<Ctx | null>(null);
 
-const STORAGE_KEY = "flourishcare_book_wizard";
+// PENTING: localStorage (bukan sessionStorage) agar bertahan saat redirect
+// ke Sumopod (buka tab/window baru) dan kembali via tombol back browser.
+const STORAGE_KEY = "flourishcare_book_wizard_v2";
 
 function loadInitial(): WizardData {
   if (typeof window === "undefined") return DEFAULT;
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return { ...DEFAULT, ...JSON.parse(raw) };
   } catch {
     // ignore
@@ -84,7 +83,7 @@ export function BookWizardProvider({ children }: { children: React.ReactNode }) 
         setData((prev) => {
           const next = { ...prev, ...patch };
           try {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
           } catch {
             // ignore
           }
@@ -93,7 +92,11 @@ export function BookWizardProvider({ children }: { children: React.ReactNode }) 
       },
       reset: () => {
         setData(DEFAULT);
-        sessionStorage.removeItem(STORAGE_KEY);
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch {
+          // ignore
+        }
       },
     }),
     [data]

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,31 @@ export function StepProfile() {
   const navigate = useNavigate();
   const { data, update } = useWizard();
   const { session } = useAuth();
+  const autofilledRef = useRef(false);
 
-  // Auto-fill dari session (email + wa dari user_metadata)
+  // Bersihkan ?code= dan ?state= dari URL setelah OAuth callback selesai
+  // (mencegah reload loop dan URL yang jelek)
   useEffect(() => {
-    if (!session) return;
-    const meta = session.user.user_metadata as { whatsapp?: string } | undefined;
-    if (!data.parent_email && session.user.email) {
-      update({ parent_email: session.user.email });
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("code") || url.searchParams.has("state") || url.searchParams.has("error")) {
+      url.searchParams.delete("code");
+      url.searchParams.delete("state");
+      url.searchParams.delete("error");
+      url.searchParams.delete("error_description");
+      window.history.replaceState({}, "", url.pathname + (url.search || ""));
     }
-    if (!data.parent_whatsapp && meta?.whatsapp) {
-      update({ parent_whatsapp: meta.whatsapp });
-    }
+  }, []);
+
+  // Auto-fill dari session (email + wa dari user_metadata) — HANYA sekali
+  useEffect(() => {
+    if (!session || autofilledRef.current) return;
+    autofilledRef.current = true;
+    const meta = session.user.user_metadata as { whatsapp?: string; full_name?: string; name?: string } | undefined;
+    const patch: Record<string, string> = {};
+    if (!data.parent_email && session.user.email) patch.parent_email = session.user.email;
+    if (!data.parent_whatsapp && meta?.whatsapp) patch.parent_whatsapp = meta.whatsapp;
+    if (!data.parent_name && (meta?.full_name || meta?.name)) patch.parent_name = meta.full_name || meta.name || "";
+    if (Object.keys(patch).length > 0) update(patch as Partial<typeof data>);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
