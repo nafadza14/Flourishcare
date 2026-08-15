@@ -10,8 +10,9 @@ import { useWizard } from "../wizardContext";
 import { Stepper } from "../Stepper";
 
 // Fallback tarif kalau row di `online_booking_prices` belum ada.
-const FALLBACK_PRICE_ONLINE = 225_000;
-const FALLBACK_PRICE_HOMECARE = 225_000;
+const FALLBACK_PRICE_ONLINE = 200_000;
+const FALLBACK_PRICE_HOMECARE = 200_000;
+const FALLBACK_ADMIN_FEE = 25_000;
 
 export function StepPayment() {
   const navigate = useNavigate();
@@ -20,9 +21,10 @@ export function StepPayment() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [prices, setPrices] = useState<{ online: number; homecare: number }>({
+  const [prices, setPrices] = useState<{ online: number; homecare: number; admin_fee: number }>({
     online: FALLBACK_PRICE_ONLINE,
     homecare: FALLBACK_PRICE_HOMECARE,
+    admin_fee: FALLBACK_ADMIN_FEE,
   });
 
   useEffect(() => {
@@ -46,19 +48,21 @@ export function StepPayment() {
         .from("online_booking_prices")
         .select("mode,price");
       if (!rows) return;
-      const map: { online: number; homecare: number } = {
+      const map: { online: number; homecare: number; admin_fee: number } = {
         online: FALLBACK_PRICE_ONLINE,
         homecare: FALLBACK_PRICE_HOMECARE,
+        admin_fee: FALLBACK_ADMIN_FEE,
       };
-      for (const r of rows as Array<{ mode: "online" | "homecare"; price: number }>) {
-        map[r.mode] = Number(r.price);
+      for (const r of rows as Array<{ mode: "online" | "homecare" | "admin_fee"; price: number }>) {
+        if (r.mode in map) map[r.mode] = Number(r.price);
       }
       setPrices(map);
     })();
   }, []);
 
   const basePrice = data.mode === "homecare" ? prices.homecare : prices.online;
-  const totalToPay = basePrice; // Selalu bayar penuh
+  const adminFee = prices.admin_fee;
+  const totalToPay = basePrice + adminFee;
 
   async function handleConfirm() {
     if (!session) return;
@@ -84,7 +88,7 @@ export function StepPayment() {
           scheduled_at: scheduledAt,
           duration_min: 60,
           homecare_address: data.mode === "homecare" ? data.homecare_address : null,
-          amount: basePrice,
+          amount: totalToPay,
           payment_type: "full",
         })
         .select()
@@ -197,9 +201,23 @@ export function StepPayment() {
 
             <hr className="border-black/5 my-5" />
 
-            <div className="flex items-baseline justify-between mb-4">
-              <p className="text-sm text-text-secondary">Total Tagihan</p>
-              <p className="text-2xl font-heading font-extrabold">Rp {totalToPay.toLocaleString("id-ID")}</p>
+            <div className="space-y-2 mb-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-text-secondary">
+                  Jasa {data.mode === "homecare" ? "Homecare" : "Psikolog"}
+                </span>
+                <span className="font-semibold">Rp {basePrice.toLocaleString("id-ID")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-text-secondary">Biaya Admin</span>
+                <span className="font-semibold">Rp {adminFee.toLocaleString("id-ID")}</span>
+              </div>
+              <div className="border-t border-black/10 pt-2 flex items-baseline justify-between">
+                <span className="font-semibold">Total Tagihan</span>
+                <span className="text-2xl font-heading font-extrabold text-primary">
+                  Rp {totalToPay.toLocaleString("id-ID")}
+                </span>
+              </div>
             </div>
 
             {error && (

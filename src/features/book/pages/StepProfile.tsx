@@ -59,23 +59,27 @@ export function StepProfile() {
                 />
               </Field>
 
-              <Field label="Nomor WhatsApp Aktif">
+              <Field label="Nomor WhatsApp Aktif (untuk kontak lanjutan)">
                 <input
                   type="tel"
                   inputMode="numeric"
                   required
                   value={data.parent_whatsapp}
                   onChange={(e) => update({ parent_whatsapp: e.target.value })}
+                  placeholder="Contoh: 081234567890"
                   className={inputCls}
                 />
+                <p className="text-xs text-text-secondary mt-1">
+                  Semua konfirmasi jadwal & follow-up akan dikirim via WhatsApp.
+                </p>
               </Field>
 
-              <Field label="Email">
+              <Field label="Email (opsional)">
                 <input
                   type="email"
-                  required
                   value={data.parent_email}
                   onChange={(e) => update({ parent_email: e.target.value })}
+                  placeholder="Boleh dikosongkan"
                   className={inputCls}
                 />
               </Field>

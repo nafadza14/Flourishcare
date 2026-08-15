@@ -103,6 +103,9 @@ export function AssessmentForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // GUARD: hanya submit kalau user memang di step 3 (klik tombol Submit Form).
+    // Cegah bug: tekan Enter di input step 1/2 memicu submit form.
+    if (step !== 3) return;
     setError(null);
     setSubmitting(true);
     try {

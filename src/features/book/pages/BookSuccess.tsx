@@ -1,7 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AdminWhatsAppLink } from "../Stepper";
 
 export function BookSuccess() {
   const [params] = useSearchParams();
@@ -25,7 +24,16 @@ export function BookSuccess() {
           <Button asChild className="rounded-full" size="lg">
             <Link to="/">Kembali ke Beranda</Link>
           </Button>
-          <AdminWhatsAppLink className="justify-center" />
+          <Button asChild variant="outline" className="rounded-full border-2">
+            <a
+              href="https://wa.me/6285887031855"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center"
+            >
+              <Phone size={16} className="mr-2" /> Chat WA Admin
+            </a>
+          </Button>
         </div>
       </div>
     </div>

@@ -63,7 +63,7 @@ const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutDashboard; ro
   { key: "records", label: "Rekam Medis", icon: FileText, roles: ["super_admin", "psikolog"] },
   { key: "finance", label: "Keuangan", icon: Wallet, roles: ["super_admin", "admin_cabang"] },
   { key: "attendance", label: "Presensi", icon: Fingerprint, roles: ["super_admin", "admin_cabang", "psikolog", "terapis", "karyawan"] },
-  { key: "settings", label: "Pengaturan", icon: Settings, roles: ["super_admin"] },
+  { key: "settings", label: "Pengaturan", icon: Settings, roles: ["super_admin", "admin_cabang"] },
 ];
 
 export function Dashboard() {

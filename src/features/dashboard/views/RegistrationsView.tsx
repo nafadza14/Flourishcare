@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { ClipboardList, Loader2, Printer, KeyRound, Check, X, Eye } from "lucide-react";
+import { ClipboardList, Loader2, Printer, KeyRound, Check, X, Eye, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { printWithTitle, isoDate } from "@/lib/print";
+import { useAuth } from "@/providers/AuthProvider";
 
 type Registration = {
   id: string;
@@ -90,10 +91,18 @@ export function RegistrationsView() {
 }
 
 function RegCard({ r, onView, onUpdated }: { r: Registration; onView: () => void; onUpdated: () => void }) {
+  const { role } = useAuth();
+  const isSuperAdmin = role === "super_admin";
   const [showRmForm, setShowRmForm] = useState(false);
   const [rmValue, setRmValue] = useState("");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState<"none" | "assign" | "editRm" | "editInfo">("none");
+  const [editName, setEditName] = useState(r.patient_name);
+  const [editComplaint, setEditComplaint] = useState(r.chief_complaint ?? "");
+  const [editDob, setEditDob] = useState(r.date_of_birth ?? "");
+  const [editEmail, setEditEmail] = useState(r.submitter_email ?? "");
+  const [deleting, setDeleting] = useState(false);
 
   async function fetchNextRm() {
     const { data } = await supabase.rpc("next_rm_number");
@@ -112,8 +121,62 @@ function RegCard({ r, onView, onUpdated }: { r: Registration; onView: () => void
       setErr(error.message);
     } else {
       setShowRmForm(false);
+      setEditMode("none");
       onUpdated();
     }
+  }
+
+  async function updateRm() {
+    setSaving(true);
+    setErr(null);
+    // Update di 2 tabel: patient_registrations & children (linked)
+    const { error: e1 } = await supabase
+      .from("patient_registrations")
+      .update({ rm_number: rmValue.trim() })
+      .eq("id", r.id);
+    if (e1) { setErr(e1.message); setSaving(false); return; }
+    if ((r as { linked_child_id?: string }).linked_child_id) {
+      await supabase
+        .from("children")
+        .update({ rm_number: rmValue.trim() })
+        .eq("id", (r as { linked_child_id: string }).linked_child_id);
+    }
+    setSaving(false);
+    setEditMode("none");
+    onUpdated();
+  }
+
+  async function updateInfo() {
+    setSaving(true);
+    setErr(null);
+    const { error } = await supabase
+      .from("patient_registrations")
+      .update({
+        patient_name: editName.trim(),
+        chief_complaint: editComplaint.trim() || null,
+        date_of_birth: editDob || null,
+        submitter_email: editEmail.trim() || null,
+      })
+      .eq("id", r.id);
+    if (error) { setErr(error.message); setSaving(false); return; }
+    if ((r as { linked_child_id?: string }).linked_child_id) {
+      await supabase
+        .from("children")
+        .update({ full_name: editName.trim(), dob: editDob || null })
+        .eq("id", (r as { linked_child_id: string }).linked_child_id);
+    }
+    setSaving(false);
+    setEditMode("none");
+    onUpdated();
+  }
+
+  async function handleDelete() {
+    if (!confirm(`HAPUS PERMANEN pendaftaran "${r.patient_name}" (${r.code})?\n\nData anak, laporan pemeriksaan, dan laporan perkembangan yang terkait juga akan terhapus. Aksi ini tidak bisa di-undo.`)) return;
+    setDeleting(true);
+    const { error } = await supabase.rpc("delete_patient_registration", { p_registration_id: r.id });
+    setDeleting(false);
+    if (error) { alert("Gagal hapus: " + error.message); return; }
+    onUpdated();
   }
 
   return (
@@ -150,8 +213,90 @@ function RegCard({ r, onView, onUpdated }: { r: Registration; onView: () => void
               <KeyRound size={14} className="mr-1" /> Input RM
             </Button>
           )}
+          {r.status === "rm_assigned" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { setRmValue(r.rm_number ?? ""); setEditMode("editRm"); }}
+              className="rounded-full border-2"
+            >
+              <Pencil size={14} className="mr-1" /> Edit RM
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setEditMode("editInfo")}
+            className="rounded-full border-2"
+          >
+            <Pencil size={14} className="mr-1" /> Edit Info
+          </Button>
+          {isSuperAdmin && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="rounded-full border-2 text-red border-red/30 hover:bg-red/10"
+            >
+              {deleting ? <Loader2 className="animate-spin" size={14} /> : <><Trash2 size={14} className="mr-1" /> Hapus</>}
+            </Button>
+          )}
         </div>
       </div>
+
+      {editMode === "editRm" && (
+        <div className="mt-4 pt-4 border-t border-black/5 bg-background rounded-2xl p-3">
+          <p className="text-xs text-text-secondary mb-2">Ubah nomor RM. Format: <span className="font-mono">FC-RM-YYMM-XXXX</span></p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              value={rmValue}
+              onChange={(e) => setRmValue(e.target.value)}
+              className="flex-1 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={updateRm} disabled={!rmValue || saving} className="rounded-full">
+                {saving ? <Loader2 className="animate-spin" size={14} /> : <><Check size={14} className="mr-1" /> Simpan</>}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setEditMode("none")} className="rounded-full">
+                <X size={14} />
+              </Button>
+            </div>
+          </div>
+          {err && <p className="text-xs text-red mt-2">{err}</p>}
+        </div>
+      )}
+
+      {editMode === "editInfo" && (
+        <div className="mt-4 pt-4 border-t border-black/5 bg-background rounded-2xl p-3 space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label className="text-xs">
+              <span className="block text-text-secondary mb-1">Nama Pasien</span>
+              <input value={editName} onChange={(e) => setEditName(e.target.value)} className="input" />
+            </label>
+            <label className="text-xs">
+              <span className="block text-text-secondary mb-1">Tanggal Lahir</span>
+              <input type="date" value={editDob} onChange={(e) => setEditDob(e.target.value)} className="input" />
+            </label>
+            <label className="text-xs sm:col-span-2">
+              <span className="block text-text-secondary mb-1">Email Pengirim</span>
+              <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} className="input" />
+            </label>
+            <label className="text-xs sm:col-span-2">
+              <span className="block text-text-secondary mb-1">Keluhan Utama</span>
+              <textarea rows={2} value={editComplaint} onChange={(e) => setEditComplaint(e.target.value)} className="input" />
+            </label>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button size="sm" variant="ghost" onClick={() => setEditMode("none")} className="rounded-full">Batal</Button>
+            <Button size="sm" onClick={updateInfo} disabled={saving || !editName.trim()} className="rounded-full">
+              {saving ? <Loader2 className="animate-spin" size={14} /> : <><Check size={14} className="mr-1" /> Simpan Perubahan</>}
+            </Button>
+          </div>
+          {err && <p className="text-xs text-red mt-1">{err}</p>}
+        </div>
+      )}
 
       {showRmForm && (
         <div className="mt-4 pt-4 border-t border-black/5 bg-background rounded-2xl p-3">

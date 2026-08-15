@@ -6,7 +6,7 @@ import type { Branch, Profile, UserRole } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 
-type PriceRow = { mode: "online" | "homecare"; price: number };
+type PriceRow = { mode: "online" | "homecare" | "admin_fee"; price: number };
 type Psi = { id: string; title: string; photo_url: string | null };
 type Schedule = {
   id: string;
@@ -175,7 +175,7 @@ function PricingSection() {
           {prices.map((p) => (
             <div key={p.mode} className="bg-background rounded-2xl p-4 border border-black/5">
               <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-2">
-                {p.mode === "online" ? "Konsultasi Online" : "Homecare Visit"}
+                {p.mode === "online" ? "Konsultasi Online" : p.mode === "homecare" ? "Homecare Visit" : "Biaya Admin"}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-text-secondary">Rp</span>
