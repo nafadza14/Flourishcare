@@ -3,6 +3,7 @@ import { Video, Home, Phone, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { formatRupiah } from "@/features/dashboard/queries";
+import { waLink, formatWaDisplay } from "@/lib/wa";
 
 type Row = {
   id: string;
@@ -114,12 +115,16 @@ export function OnlineBookingsView() {
               <div>
                 <p className="uppercase tracking-wider text-[10px]">WhatsApp</p>
                 <a
-                  href={`https://wa.me/${b.parent_whatsapp.replace(/\D/g, "")}`}
+                  href={waLink(
+                    b.parent_whatsapp,
+                    `Halo ${b.parent_name}, ini admin FlourishCare. Kami ingin mengonfirmasi booking Anda (${b.code}).`
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-text-primary hover:text-primary inline-flex items-center gap-1"
+                  className="font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                  title="Klik untuk chat via WhatsApp Web/App"
                 >
-                  <Phone size={11} /> {b.parent_whatsapp}
+                  <Phone size={11} /> {formatWaDisplay(b.parent_whatsapp)}
                 </a>
               </div>
               <div>
