@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Video, Home, Phone, Loader2 } from "lucide-react";
+import { Video, Home, Phone, Loader2, Link2, Check, X, Pencil, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { EmptyState, LoadingBlock } from "@/features/dashboard/common";
 import { formatRupiah } from "@/features/dashboard/queries";
 import { waLink, formatWaDisplay } from "@/lib/wa";
+import { useAuth } from "@/providers/AuthProvider";
 
 type Row = {
   id: string;
@@ -19,6 +20,7 @@ type Row = {
   status: string;
   consultation_topic: string;
   homecare_address: string | null;
+  meeting_url: string | null;
   created_at: string;
 };
 
@@ -32,9 +34,15 @@ const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
 };
 
 export function OnlineBookingsView() {
+  const { role } = useAuth();
+  const canEditLink = role === "super_admin" || role === "admin_cabang";
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [linkDraft, setLinkDraft] = useState<string>("");
+  const [linkSaving, setLinkSaving] = useState(false);
+  const [linkErr, setLinkErr] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -68,6 +76,33 @@ export function OnlineBookingsView() {
     void load();
   }
 
+  function openEditLink(b: Row) {
+    setLinkDraft(b.meeting_url ?? "");
+    setLinkErr(null);
+    setEditingLinkId(b.id);
+  }
+
+  async function saveMeetingLink(id: string) {
+    setLinkErr(null);
+    const trimmed = linkDraft.trim();
+    if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+      setLinkErr("Link harus dimulai dengan http:// atau https://");
+      return;
+    }
+    setLinkSaving(true);
+    const { error } = await supabase
+      .from("online_bookings")
+      .update({ meeting_url: trimmed || null })
+      .eq("id", id);
+    setLinkSaving(false);
+    if (error) {
+      setLinkErr(error.message);
+      return;
+    }
+    setEditingLinkId(null);
+    void load();
+  }
+
   if (loading) return <LoadingBlock />;
   if (rows.length === 0)
     return (
@@ -82,6 +117,7 @@ export function OnlineBookingsView() {
     <div className="space-y-3">
       {rows.map((b) => {
         const st = STATUS_LABEL[b.status] ?? { text: b.status, cls: "bg-gray-100 text-gray-600" };
+        const isPaid = ["confirmed", "awaiting_confirmation", "completed"].includes(b.status);
         return (
           <div key={b.id} className="bg-white rounded-3xl border border-black/5 p-5 shadow-warm-sm">
             <div className="flex items-start justify-between gap-3 mb-3">
@@ -145,6 +181,97 @@ export function OnlineBookingsView() {
               <p className="text-xs text-text-secondary mt-3">
                 <span className="font-semibold text-text-primary">Alamat:</span> {b.homecare_address}
               </p>
+            )}
+
+            {/* Meeting link section — hanya untuk mode online & booking sudah dibayar */}
+            {b.mode === "online" && isPaid && (
+              <div className="mt-3 pt-3 border-t border-black/5">
+                {editingLinkId === b.id ? (
+                  <div className="bg-primary/5 rounded-2xl p-3 border border-primary/20">
+                    <label className="block text-xs font-semibold text-primary mb-1.5 flex items-center gap-1">
+                      <Link2 size={12} /> Link Konsultasi Online (Zoom / Google Meet / dll)
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="url"
+                        value={linkDraft}
+                        onChange={(e) => setLinkDraft(e.target.value)}
+                        placeholder="https://meet.google.com/xxx-xxx-xxx"
+                        className="flex-1 rounded-full border border-black/10 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveMeetingLink(b.id)}
+                          disabled={linkSaving}
+                          className="text-xs px-3 py-2 rounded-full bg-primary text-white font-semibold hover:bg-primary-hover disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {linkSaving ? <Loader2 className="animate-spin" size={12} /> : <Check size={12} />}
+                          Simpan
+                        </button>
+                        <button
+                          onClick={() => setEditingLinkId(null)}
+                          className="text-xs px-3 py-2 rounded-full border border-black/10 hover:bg-black/5"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    </div>
+                    {linkErr && <p className="text-xs text-red mt-1">{linkErr}</p>}
+                    <p className="text-[11px] text-text-secondary mt-1.5">
+                      Contoh: link Google Meet, Zoom, WhatsApp Video, Microsoft Teams. Psikolog akan melihat link ini di dashboard mereka.
+                    </p>
+                  </div>
+                ) : b.meeting_url ? (
+                  <div className="flex items-center justify-between gap-3 bg-green-50 rounded-2xl p-3 border border-green-200">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Link2 size={16} className="text-green-700 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[11px] uppercase tracking-wider text-green-700 font-semibold">Link Konsultasi</p>
+                        <a
+                          href={b.meeting_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline font-medium truncate block"
+                          title={b.meeting_url}
+                        >
+                          {b.meeting_url}
+                        </a>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <a
+                        href={b.meeting_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs px-3 py-2 rounded-full bg-primary text-white font-semibold hover:bg-primary-hover inline-flex items-center gap-1"
+                      >
+                        <ExternalLink size={12} /> Buka
+                      </a>
+                      {canEditLink && (
+                        <button
+                          onClick={() => openEditLink(b)}
+                          className="text-xs px-3 py-2 rounded-full border border-black/10 hover:bg-black/5 inline-flex items-center gap-1"
+                          title="Ubah link"
+                        >
+                          <Pencil size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : canEditLink ? (
+                  <button
+                    onClick={() => openEditLink(b)}
+                    className="w-full text-left bg-yellow-50 hover:bg-yellow-100 rounded-2xl p-3 border border-yellow-200 border-dashed flex items-center gap-2 text-sm text-yellow-800 font-medium transition-colors"
+                  >
+                    <Link2 size={16} /> Belum ada link konsultasi. Klik untuk tambahkan link Zoom/Meet.
+                  </button>
+                ) : (
+                  <div className="bg-yellow-50 rounded-2xl p-3 border border-yellow-200 text-xs text-yellow-800 flex items-center gap-2">
+                    <Link2 size={14} /> Menunggu admin memasukkan link konsultasi online.
+                  </div>
+                )}
+              </div>
             )}
 
             {b.status === "awaiting_confirmation" && (
