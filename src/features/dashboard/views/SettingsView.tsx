@@ -751,34 +751,60 @@ function BookableStaffSection() {
     if (!editingId) return;
     setEditSaving(true);
     setMsg(null);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("staff_profiles")
       .update({ title: editTitle.trim(), photo_url: editPhotoUrl || null })
-      .eq("id", editingId);
+      .eq("id", editingId)
+      .select("id, title, photo_url")
+      .maybeSingle();
     setEditSaving(false);
     if (error) {
       setMsg(`Error: ${error.message}`);
       return;
     }
+    if (!data) {
+      setMsg(
+        "Error: perubahan tidak tersimpan (kemungkinan permission). " +
+        "Jalankan SQL policy staff_profiles_admin_write di Supabase."
+      );
+      return;
+    }
     setEditingId(null);
-    setMsg("Detail psikolog tersimpan.");
+    setMsg("Detail psikolog tersimpan permanen.");
     void load();
   }
 
   async function toggleBookable(id: string, next: boolean) {
     setSavingId(id);
     setMsg(null);
-    const { error } = await supabase
+    // Update + return actual updated row (bukan optimistic — kita mau lihat DB yg sebenarnya berubah)
+    const { data, error } = await supabase
       .from("staff_profiles")
       .update({ is_bookable_online: next })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id, is_bookable_online")
+      .maybeSingle();
     setSavingId(null);
     if (error) {
       setMsg(`Error: ${error.message}`);
-    } else {
-      setStaff((prev) => prev.map((s) => (s.id === id ? { ...s, is_bookable_online: next } : s)));
-      setMsg(`Tersimpan. Halaman booking akan menampilkan perubahan setelah reload.`);
+      return;
     }
+    if (!data) {
+      // Update tidak menyentuh row apapun — RLS block. Beri error jelas.
+      setMsg(
+        "Error: perubahan tidak tersimpan (kemungkinan permission). " +
+        "Jalankan SQL policy staff_profiles_admin_write di Supabase, lalu coba lagi."
+      );
+      return;
+    }
+    // DB confirm — update local state sesuai hasil DB
+    const actualValue = (data as { is_bookable_online: boolean }).is_bookable_online;
+    setStaff((prev) => prev.map((s) => (s.id === id ? { ...s, is_bookable_online: actualValue } : s)));
+    setMsg(
+      actualValue === next
+        ? `Tersimpan permanen. Halaman booking akan menampilkan perubahan setelah reload.`
+        : `Warning: DB return nilai berbeda (${String(actualValue)}). Cek policy RLS.`
+    );
   }
 
   return (
