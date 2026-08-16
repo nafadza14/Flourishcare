@@ -22,6 +22,10 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   ]);
 }
 
+// Flag global: menandai user memang klik "Keluar" secara eksplisit.
+// Selama flag ini false, jangan clear session pada event apapun kecuali error hard.
+let userInitiatedSignOut = false;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -31,12 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loadedForUserIdRef = useRef<string | null>(null);
 
   const loadProfile = useCallback(async (userId: string, forceReload = false) => {
-    // Kalau profile sudah ter-load untuk user ini dan tidak dipaksa reload, skip.
     if (!forceReload && loadedForUserIdRef.current === userId) return;
     setProfileLoading(true);
     currentUserIdRef.current = userId;
     try {
-      // Pakai RPC SECURITY DEFINER dulu (bypass RLS). Kalau gagal, fallback ke query biasa.
       const rpcRes = await withTimeout(
         supabase.rpc("get_my_profile") as unknown as Promise<{ data: unknown; error: unknown }>,
         8000,
@@ -47,7 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (rpcRows && rpcRows.length > 0) {
         profileData = rpcRows[0];
       } else if (rpcRes.error) {
-        // Fallback: query langsung
         const query = supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
         const { data } = await withTimeout(
           query as unknown as Promise<{ data: Profile | null; error: unknown }>,
@@ -58,14 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (currentUserIdRef.current !== userId) return;
-      setProfile(profileData);
-      loadedForUserIdRef.current = userId;
+      // PENTING: kalau profile sudah ada dan re-fetch return null (kemungkinan RLS glitch/timeout),
+      // JANGAN reset ke null. Pertahankan profile lama.
+      if (profileData) {
+        setProfile(profileData);
+        loadedForUserIdRef.current = userId;
+      }
       // eslint-disable-next-line no-console
-      console.log("[AuthProvider] Profile loaded:", profileData?.role ?? "none");
+      console.log("[AuthProvider] Profile loaded:", profileData?.role ?? "kept previous");
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("loadProfile error:", e);
-      if (currentUserIdRef.current === userId) setProfile(null);
+      // JANGAN clear profile on error — pertahankan state terakhir yang valid
     } finally {
       if (currentUserIdRef.current === userId) setProfileLoading(false);
     }
@@ -78,20 +83,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         4000,
         { data: { session: null } } as { data: { session: Session | null } }
       );
-      setSession(data.session);
-      if (data.session?.user?.id) {
-        // Force reload dari tombol Retry
-        await loadProfile(data.session.user.id, true);
-      } else {
-        currentUserIdRef.current = null;
-        loadedForUserIdRef.current = null;
-        setProfile(null);
+      if (data.session) {
+        setSession(data.session);
+        if (data.session.user?.id) {
+          await loadProfile(data.session.user.id, true);
+        }
       }
+      // Kalau getSession return null tapi user TIDAK explicit logout,
+      // JANGAN clear state — mungkin cuma transient error.
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn("refresh error:", e);
-      setSession(null);
-      setProfile(null);
     }
   }, [loadProfile]);
 
@@ -115,25 +117,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })();
 
-    // PENTING: hanya reload profile pada event yang mengubah identitas user.
-    // TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION tidak perlu reload profile
-    // (identitas user sama, profile tidak berubah).
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, s) => {
       // eslint-disable-next-line no-console
-      console.log("[AuthProvider] onAuthStateChange:", event, s?.user?.email);
-      setSession(s);
+      console.log("[AuthProvider] onAuthStateChange:", event, s?.user?.email, "userInitiatedSignOut:", userInitiatedSignOut);
+
       if (event === "SIGNED_IN") {
+        setSession(s);
         if (s?.user?.id && loadedForUserIdRef.current !== s.user.id) {
           await loadProfile(s.user.id);
         }
-      } else if (event === "SIGNED_OUT") {
-        currentUserIdRef.current = null;
-        loadedForUserIdRef.current = null;
-        setProfile(null);
-        setProfileLoading(false);
+        return;
       }
-      // TOKEN_REFRESHED / USER_UPDATED / INITIAL_SESSION → jangan sentuh profile state.
+
+      if (event === "SIGNED_OUT") {
+        // Hanya clear kalau user memang klik Keluar (userInitiatedSignOut = true).
+        // Ini mencegah "auto logout" saat token refresh gagal atau race condition.
+        if (userInitiatedSignOut) {
+          currentUserIdRef.current = null;
+          loadedForUserIdRef.current = null;
+          setSession(null);
+          setProfile(null);
+          setProfileLoading(false);
+          userInitiatedSignOut = false;
+        } else {
+          // Silent recovery: coba ambil session lagi dari storage.
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            setSession(data.session);
+            // eslint-disable-next-line no-console
+            console.log("[AuthProvider] SIGNED_OUT ignored - session recovered");
+          }
+        }
+        return;
+      }
+
+      if (event === "TOKEN_REFRESHED") {
+        // Update session reference dengan token baru, JANGAN reload profile.
+        if (s) setSession(s);
+        return;
+      }
+
+      if (event === "USER_UPDATED") {
+        if (s) setSession(s);
+        return;
+      }
+
+      // INITIAL_SESSION: biarkan initial useEffect yang handle
     });
+
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
@@ -141,6 +172,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [loadProfile]);
 
   const signOut = useCallback(async () => {
+    // Tandai bahwa ini logout dari user
+    userInitiatedSignOut = true;
     await supabase.auth.signOut();
     currentUserIdRef.current = null;
     loadedForUserIdRef.current = null;
