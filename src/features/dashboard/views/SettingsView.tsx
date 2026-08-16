@@ -700,7 +700,15 @@ type BookableStaff = {
   is_visible: boolean;
   is_bookable_online: boolean;
   display_order: number | null;
+  homecare_services: string[] | null;
 };
+
+const HOMECARE_SVC_OPTIONS = [
+  { key: "bt", label: "BT Psikolog" },
+  { key: "si", label: "SI" },
+  { key: "ot", label: "OT" },
+  { key: "tw", label: "TW" },
+];
 
 function BookableStaffSection() {
   const { role } = useAuth();
@@ -712,6 +720,7 @@ function BookableStaffSection() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editPhotoUrl, setEditPhotoUrl] = useState("");
+  const [editServices, setEditServices] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [editSaving, setEditSaving] = useState(false);
 
@@ -719,7 +728,7 @@ function BookableStaffSection() {
     setLoading(true);
     const { data } = await supabase
       .from("staff_profiles")
-      .select("id, title, slug, photo_url, is_visible, is_bookable_online, display_order")
+      .select("id, title, slug, photo_url, is_visible, is_bookable_online, display_order, homecare_services")
       .order("display_order", { ascending: true });
     setStaff((data as BookableStaff[]) ?? []);
     setLoading(false);
@@ -731,6 +740,13 @@ function BookableStaffSection() {
     setEditingId(s.id);
     setEditTitle(s.title);
     setEditPhotoUrl(s.photo_url ?? "");
+    setEditServices(s.homecare_services ?? []);
+  }
+
+  function toggleEditService(key: string) {
+    setEditServices((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   }
 
   async function handlePhotoUpload(file: File) {
@@ -763,9 +779,13 @@ function BookableStaffSection() {
     setMsg(null);
     const { data, error } = await supabase
       .from("staff_profiles")
-      .update({ title: editTitle.trim(), photo_url: editPhotoUrl || null })
+      .update({
+        title: editTitle.trim(),
+        photo_url: editPhotoUrl || null,
+        homecare_services: editServices,
+      })
       .eq("id", editingId)
-      .select("id, title, photo_url")
+      .select("id, title, photo_url, homecare_services")
       .maybeSingle();
     setEditSaving(false);
     if (error) {
@@ -861,6 +881,16 @@ function BookableStaffSection() {
                     <span className="text-red font-medium">Tidak aktif di booking online</span>
                   )}
                 </p>
+                {s.homecare_services && s.homecare_services.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="text-[10px] text-text-secondary">Homecare:</span>
+                    {s.homecare_services.map((h) => (
+                      <span key={h} className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                        {h.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {canEdit && (
@@ -959,6 +989,31 @@ function BookableStaffSection() {
                   className="input font-mono text-xs"
                 />
               </label>
+
+              <div>
+                <p className="block text-xs font-semibold text-text-secondary mb-1.5">
+                  Layanan Homecare yang di-handle
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {HOMECARE_SVC_OPTIONS.map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => toggleEditService(s.key)}
+                      className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-colors ${
+                        editServices.includes(s.key)
+                          ? "bg-primary/10 border-primary text-primary"
+                          : "bg-white border-black/10 text-text-secondary hover:border-primary/40"
+                      }`}
+                    >
+                      {editServices.includes(s.key) ? "✓ " : ""}{s.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-text-secondary mt-1">
+                  Contoh: Psikolog centang <span className="font-mono">BT Psikolog</span>. Terapis centang <span className="font-mono">SI/OT/TW</span> sesuai keahlian.
+                </p>
+              </div>
 
               <div className="flex justify-end gap-2 pt-2">
                 <Button variant="outline" onClick={() => setEditingId(null)} className="rounded-full">Batal</Button>

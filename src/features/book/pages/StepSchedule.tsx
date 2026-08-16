@@ -14,6 +14,7 @@ type Psi = {
   title: string;
   slug: string;
   photo_url: string | null;
+  homecare_services: string[] | null;
 };
 
 type Slot = { slot_time: string; is_available: boolean };
@@ -42,28 +43,42 @@ export function StepSchedule() {
     }
   }, [data, navigate]);
 
-  // Ambil daftar psikolog
+  // Ambil daftar psikolog/terapis
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoadingPsi(true);
       const { data: rows } = await supabase
         .from("staff_profiles")
-        .select("id,title,slug,photo_url")
+        .select("id,title,slug,photo_url,homecare_services")
         .eq("is_visible", true)
         .eq("is_bookable_online", true)
         .order("display_order");
       if (cancelled) return;
       const list = (rows ?? []) as Psi[];
       setPsychs(list);
-      if (!data.psychologist_id && list[0]) {
-        update({ psychologist_id: list[0].id, psychologist_name: list[0].title });
-      }
       setLoadingPsi(false);
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Filter psikolog/terapis berdasarkan mode dan layanan homecare yang dipilih
+  const filteredPsychs = useMemo(() => {
+    if (data.mode === "online") return psychs; // Semua boleh untuk online
+    if (!data.homecare_service) return []; // Homecare tapi belum pilih layanan → kosong dulu
+    return psychs.filter((p) => (p.homecare_services ?? []).includes(data.homecare_service));
+  }, [psychs, data.mode, data.homecare_service]);
+
+  // Reset selected psikolog kalau ganti layanan homecare & psikolog lama tidak match
+  useEffect(() => {
+    if (!data.psychologist_id) return;
+    const stillValid = filteredPsychs.some((p) => p.id === data.psychologist_id);
+    if (!stillValid) {
+      update({ psychologist_id: "", psychologist_name: "", scheduled_date: "", scheduled_time: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredPsychs, data.psychologist_id]);
 
   // Ambil day_of_week yang tersedia untuk psikolog terpilih
   useEffect(() => {
@@ -234,13 +249,24 @@ export function StepSchedule() {
           </>
         )}
 
-        {/* Pilih Psikolog */}
-        <p className="text-primary font-semibold text-xs uppercase tracking-wider mb-3">Pilih Psikolog</p>
+        {/* Pilih Psikolog / Terapis (filtered by mode + layanan homecare) */}
+        <p className="text-primary font-semibold text-xs uppercase tracking-wider mb-3">
+          {data.mode === "homecare" ? "Pilih Terapis / Psikolog" : "Pilih Psikolog"}
+        </p>
         {loadingPsi ? (
           <div className="py-8 text-center text-text-secondary"><Loader2 className="animate-spin inline mr-2" size={16} /> Memuat…</div>
+        ) : data.mode === "homecare" && !data.homecare_service ? (
+          <div className="py-6 text-center text-text-secondary text-sm bg-background rounded-2xl border border-black/5 mb-8">
+            Pilih dulu layanan homecare di atas untuk melihat terapis yang tersedia.
+          </div>
+        ) : filteredPsychs.length === 0 ? (
+          <div className="py-6 text-center text-text-secondary text-sm bg-yellow-50 border border-yellow-200 rounded-2xl mb-8">
+            Belum ada {data.mode === "homecare" ? "terapis/psikolog" : "psikolog"} yang tersedia untuk layanan ini.
+            Silakan pilih layanan lain atau hubungi admin.
+          </div>
         ) : (
-          <div className={`grid grid-cols-1 sm:grid-cols-${Math.min(3, psychs.length || 1)} gap-3 mb-8`}>
-            {psychs.map((p) => (
+          <div className={`grid grid-cols-1 sm:grid-cols-${Math.min(3, filteredPsychs.length || 1)} gap-3 mb-8`}>
+            {filteredPsychs.map((p) => (
               <button
                 key={p.id}
                 type="button"
