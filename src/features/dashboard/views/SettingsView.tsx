@@ -16,6 +16,7 @@ type Schedule = {
   end_time: string;
   session_duration_min: number;
   is_active: boolean;
+  mode: "online" | "homecare";
 };
 
 const DAY_LABELS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
@@ -226,6 +227,8 @@ function SchedulesSection() {
   const [newDuration, setNewDuration] = useState<number>(60);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  // Tab mode: online atau homecare
+  const [scheduleMode, setScheduleMode] = useState<"online" | "homecare">("online");
 
   useEffect(() => {
     (async () => {
@@ -272,6 +275,7 @@ function SchedulesSection() {
       end_time: newEnd,
       session_duration_min: newDuration,
       is_active: true,
+      mode: scheduleMode,
     });
     setSaving(false);
     if (error) setMsg(`Error: ${error.message}`);
@@ -298,10 +302,11 @@ function SchedulesSection() {
   return (
     <section className="bg-white rounded-2xl border border-black/5 p-5">
       <h3 className="font-heading font-bold flex items-center gap-2 mb-1">
-        <CalendarIcon size={18} className="text-primary" /> Jadwal Psikolog (Booking Online)
+        <CalendarIcon size={18} className="text-primary" /> Jadwal Psikolog
       </h3>
       <p className="text-xs text-text-secondary mb-4">
-        Kelola jadwal sesi online & homecare. Perubahan langsung mempengaruhi slot di halaman booking publik.
+        Kelola jadwal sesi <span className="font-semibold">Online</span> dan <span className="font-semibold">Homecare Visit</span> terpisah.
+        Perubahan langsung mempengaruhi slot di halaman booking publik.
       </p>
 
       {loadingPsi ? (
@@ -330,14 +335,35 @@ function SchedulesSection() {
             </div>
           </div>
 
-          {/* Daftar jadwal existing */}
+          {/* Tab Mode: Online vs Homecare */}
+          <div className="flex gap-2 mb-3 border-b border-black/5">
+            {(["online", "homecare"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setScheduleMode(m)}
+                className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
+                  scheduleMode === m
+                    ? "border-primary text-primary"
+                    : "border-transparent text-text-secondary hover:text-primary"
+                }`}
+              >
+                {m === "online" ? "🎥 Konsultasi Online" : "🏠 Homecare Visit"}
+              </button>
+            ))}
+          </div>
+
+          {/* Daftar jadwal existing — filter by mode */}
           <div className="bg-background rounded-2xl border border-black/5 divide-y divide-black/5 mb-5">
             {loadingSched ? (
               <div className="p-4 text-sm text-text-secondary">Memuat jadwal…</div>
-            ) : schedules.length === 0 ? (
-              <div className="p-4 text-sm text-text-secondary">Belum ada jadwal untuk psikolog ini.</div>
+            ) : schedules.filter((s) => s.mode === scheduleMode).length === 0 ? (
+              <div className="p-4 text-sm text-text-secondary">
+                Belum ada jadwal <span className="font-semibold">{scheduleMode === "online" ? "online" : "homecare"}</span> untuk psikolog ini.
+                Tambahkan di form di bawah.
+              </div>
             ) : (
-              schedules.map((s) => (
+              schedules.filter((s) => s.mode === scheduleMode).map((s) => (
                 <div key={s.id} className="p-3 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-14 text-center">
@@ -378,7 +404,7 @@ function SchedulesSection() {
           {canEdit && (
             <div className="bg-background rounded-2xl border border-black/5 p-4">
               <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">
-                Tambah Jadwal Baru
+                Tambah Jadwal {scheduleMode === "online" ? "Online" : "Homecare"} Baru
               </p>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
                 <div>

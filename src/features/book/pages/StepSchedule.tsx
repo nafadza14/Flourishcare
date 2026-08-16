@@ -72,11 +72,12 @@ export function StepSchedule() {
         .from("psychologist_schedules")
         .select("day_of_week")
         .eq("staff_id", data.psychologist_id)
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .eq("mode", data.mode);
       const uniq = Array.from(new Set((rows ?? []).map((r) => r.day_of_week as number)));
       setScheduledDays(uniq);
     })();
-  }, [data.psychologist_id]);
+  }, [data.psychologist_id, data.mode]);
 
   // Ambil slot ketika tanggal dipilih.
   // Coba RPC dulu; kalau gagal / kosong, fallback ke generate client-side dari schedule.
@@ -103,7 +104,8 @@ export function StepSchedule() {
           .select("start_time,end_time,session_duration_min")
           .eq("staff_id", data.psychologist_id)
           .eq("day_of_week", dow)
-          .eq("is_active", true);
+          .eq("is_active", true)
+          .eq("mode", data.mode);
 
         const generated: Slot[] = [];
         for (const s of schedRows ?? []) {
@@ -148,7 +150,7 @@ export function StepSchedule() {
         setLoadingSlots(false);
       }
     })();
-  }, [data.psychologist_id, data.scheduled_date]);
+  }, [data.psychologist_id, data.scheduled_date, data.mode]);
 
   const monthMatrix = useMemo(() => buildMonthMatrix(monthCursor), [monthCursor]);
 
