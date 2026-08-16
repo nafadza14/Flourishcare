@@ -95,6 +95,29 @@ serve(async (req) => {
       throw new Error(`Gagal simpan profile: ${insertErr.message}`);
     }
 
+    // 4b. Kalau role = psikolog atau terapis, otomatis buat row di staff_profiles
+    //     agar bisa muncul di halaman booking online / homecare.
+    //     Default is_visible=true tapi is_bookable_online=false — super admin harus
+    //     toggle ON manual di tab Pengaturan → Kelola Psikolog di Booking Online.
+    if (role === "psikolog" || role === "terapis") {
+      const slug = full_name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      const { error: staffErr } = await supabaseAdmin.from("staff_profiles").insert({
+        profile_id: created.user.id,
+        title: full_name,
+        slug: `${slug}-${created.user.id.slice(0, 6)}`,
+        bio: "",
+        specialties: [],
+        therapy_types: [],
+        is_visible: true,
+        is_bookable_online: false,
+        display_order: 999,
+      });
+      if (staffErr) {
+        // Log tapi jangan rollback — akun tetap valid, super admin bisa manual add nanti
+        console.warn("staff_profiles insert warning:", staffErr.message);
+      }
+    }
+
     // 5. Audit log
     await supabaseAdmin.from("activity_logs").insert({
       actor_id: callerId,

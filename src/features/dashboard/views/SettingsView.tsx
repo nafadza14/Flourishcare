@@ -699,6 +699,11 @@ function BookableStaffSection() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPhotoUrl, setEditPhotoUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [editSaving, setEditSaving] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -711,6 +716,54 @@ function BookableStaffSection() {
   }
 
   useEffect(() => { void load(); }, []);
+
+  function openEdit(s: BookableStaff) {
+    setEditingId(s.id);
+    setEditTitle(s.title);
+    setEditPhotoUrl(s.photo_url ?? "");
+  }
+
+  async function handlePhotoUpload(file: File) {
+    if (!editingId) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setMsg("Error: ukuran foto maksimal 5 MB.");
+      return;
+    }
+    setUploading(true);
+    setMsg(null);
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${editingId}/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("staff-avatars")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (upErr) {
+      setMsg(`Error upload: ${upErr.message}`);
+      setUploading(false);
+      return;
+    }
+    const { data: pub } = supabase.storage.from("staff-avatars").getPublicUrl(path);
+    setEditPhotoUrl(pub.publicUrl);
+    setUploading(false);
+    setMsg("Foto ter-upload, klik Simpan untuk menerapkan.");
+  }
+
+  async function saveEdit() {
+    if (!editingId) return;
+    setEditSaving(true);
+    setMsg(null);
+    const { error } = await supabase
+      .from("staff_profiles")
+      .update({ title: editTitle.trim(), photo_url: editPhotoUrl || null })
+      .eq("id", editingId);
+    setEditSaving(false);
+    if (error) {
+      setMsg(`Error: ${error.message}`);
+      return;
+    }
+    setEditingId(null);
+    setMsg("Detail psikolog tersimpan.");
+    void load();
+  }
 
   async function toggleBookable(id: string, next: boolean) {
     setSavingId(id);
@@ -773,28 +826,40 @@ function BookableStaffSection() {
                   )}
                 </p>
               </div>
-              <button
-                type="button"
-                disabled={!canEdit || savingId === s.id}
-                onClick={() => toggleBookable(s.id, !s.is_bookable_online)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors disabled:opacity-50 ${
-                  s.is_bookable_online
-                    ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                    : "bg-red/10 text-red border-red/20 hover:bg-red/20"
-                }`}
-              >
-                {savingId === s.id ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : s.is_bookable_online ? (
-                  <>
-                    <Eye size={12} /> Aktif
-                  </>
-                ) : (
-                  <>
-                    <EyeOff size={12} /> Nonaktif
-                  </>
+              <div className="flex items-center gap-2">
+                {canEdit && (
+                  <button
+                    type="button"
+                    onClick={() => openEdit(s)}
+                    className="text-xs px-3 py-1.5 rounded-full border border-black/10 hover:bg-black/5 font-medium"
+                    title="Edit foto & nama"
+                  >
+                    Edit
+                  </button>
                 )}
-              </button>
+                <button
+                  type="button"
+                  disabled={!canEdit || savingId === s.id}
+                  onClick={() => toggleBookable(s.id, !s.is_bookable_online)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors disabled:opacity-50 ${
+                    s.is_bookable_online
+                      ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                      : "bg-red/10 text-red border-red/20 hover:bg-red/20"
+                  }`}
+                >
+                  {savingId === s.id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : s.is_bookable_online ? (
+                    <>
+                      <Eye size={12} /> Aktif
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff size={12} /> Nonaktif
+                    </>
+                  )}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -802,6 +867,72 @@ function BookableStaffSection() {
 
       {msg && (
         <p className={`text-xs mt-3 ${msg.startsWith("Error") ? "text-red" : "text-green-700"}`}>{msg}</p>
+      )}
+
+      {/* Modal Edit foto & detail psikolog */}
+      {editingId && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-warm-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-heading font-bold text-lg">Edit Profil Psikolog</h4>
+              <button onClick={() => setEditingId(null)} className="p-1 hover:bg-black/5 rounded-full">✕</button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                {editPhotoUrl ? (
+                  <img src={editPhotoUrl} alt="preview" className="w-20 h-20 rounded-full object-cover border-2 border-primary/20" />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
+                    {editTitle.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <label className={`inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold cursor-pointer border ${uploading ? "opacity-50 cursor-not-allowed" : "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20"}`}>
+                    {uploading ? <><Loader2 size={12} className="animate-spin" /> Uploading…</> : <>📷 Upload Foto Baru</>}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handlePhotoUpload(f);
+                      }}
+                    />
+                  </label>
+                  <p className="text-[11px] text-text-secondary mt-1">JPG/PNG/WEBP, maks. 5 MB. Kotak (1:1) hasilnya paling rapi.</p>
+                </div>
+              </div>
+
+              <label className="block">
+                <span className="block text-xs font-semibold text-text-secondary mb-1">Nama Lengkap + Gelar</span>
+                <input
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  placeholder="Contoh: Achla Himmah M.Psi., Psikolog"
+                  className="input"
+                />
+              </label>
+
+              <label className="block">
+                <span className="block text-xs font-semibold text-text-secondary mb-1">Atau, URL Foto (opsional)</span>
+                <input
+                  value={editPhotoUrl}
+                  onChange={(e) => setEditPhotoUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="input font-mono text-xs"
+                />
+              </label>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setEditingId(null)} className="rounded-full">Batal</Button>
+                <Button onClick={saveEdit} disabled={editSaving || !editTitle.trim()} className="rounded-full">
+                  {editSaving ? <><Loader2 size={14} className="animate-spin mr-1" /> Menyimpan…</> : "Simpan"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );
