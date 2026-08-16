@@ -20,6 +20,7 @@ type Row = {
   status: string;
   consultation_topic: string;
   homecare_address: string | null;
+  homecare_service: "bt" | "si" | "ot" | "tw" | null;
   meeting_url: string | null;
   created_at: string;
 };
@@ -127,7 +128,9 @@ export function OnlineBookingsView() {
                   <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${st.cls}`}>{st.text}</span>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium inline-flex items-center gap-1">
                     {b.mode === "homecare" ? <Home size={11} /> : <Video size={11} />}
-                    {b.mode === "homecare" ? "Homecare" : "Online"}
+                    {b.mode === "homecare"
+                      ? `Homecare${b.homecare_service ? ` ${b.homecare_service.toUpperCase()}` : ""}`
+                      : "Online"}
                   </span>
                 </div>
                 <p className="font-semibold text-base">{b.child_name}</p>

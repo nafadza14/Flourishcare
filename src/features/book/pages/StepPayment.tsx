@@ -9,9 +9,11 @@ import { fadeUp } from "@/lib/motion";
 import { useWizard } from "../wizardContext";
 import { Stepper } from "../Stepper";
 
+import { HOMECARE_SERVICES, getHomecareService } from "@/lib/homecarePrices";
+
 // Fallback tarif kalau row di `online_booking_prices` belum ada.
 const FALLBACK_PRICE_ONLINE = 200_000;
-const FALLBACK_PRICE_HOMECARE = 200_000;
+const FALLBACK_PRICE_HOMECARE = 300_000;
 const FALLBACK_ADMIN_FEE = 25_000;
 
 // Format tanggal ke DD/MM/YYYY + hari (bahasa Indonesia)
@@ -30,10 +32,14 @@ export function StepPayment() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [prices, setPrices] = useState<{ online: number; homecare: number; admin_fee: number }>({
+  const [prices, setPrices] = useState<Record<string, number>>({
     online: FALLBACK_PRICE_ONLINE,
     homecare: FALLBACK_PRICE_HOMECARE,
     admin_fee: FALLBACK_ADMIN_FEE,
+    homecare_bt: FALLBACK_PRICE_HOMECARE,
+    homecare_si: FALLBACK_PRICE_HOMECARE,
+    homecare_ot: FALLBACK_PRICE_HOMECARE,
+    homecare_tw: FALLBACK_PRICE_HOMECARE,
   });
 
   useEffect(() => {
@@ -57,21 +63,36 @@ export function StepPayment() {
         .from("online_booking_prices")
         .select("mode,price");
       if (!rows) return;
-      const map: { online: number; homecare: number; admin_fee: number } = {
+      const map: Record<string, number> = {
         online: FALLBACK_PRICE_ONLINE,
         homecare: FALLBACK_PRICE_HOMECARE,
         admin_fee: FALLBACK_ADMIN_FEE,
+        homecare_bt: FALLBACK_PRICE_HOMECARE,
+        homecare_si: FALLBACK_PRICE_HOMECARE,
+        homecare_ot: FALLBACK_PRICE_HOMECARE,
+        homecare_tw: FALLBACK_PRICE_HOMECARE,
       };
-      for (const r of rows as Array<{ mode: "online" | "homecare" | "admin_fee"; price: number }>) {
-        if (r.mode in map) map[r.mode] = Number(r.price);
+      for (const r of rows as Array<{ mode: string; price: number }>) {
+        map[r.mode] = Number(r.price);
       }
       setPrices(map);
     })();
   }, []);
 
-  const basePrice = data.mode === "homecare" ? prices.homecare : prices.online;
+  // Untuk homecare, harga per layanan (BT/SI/OT/TW). Untuk online, harga tunggal.
+  const homecareSvc = getHomecareService(data.homecare_service);
+  const basePrice =
+    data.mode === "homecare"
+      ? homecareSvc
+        ? (prices[homecareSvc.priceMode] ?? FALLBACK_PRICE_HOMECARE)
+        : prices.homecare
+      : prices.online;
   const adminFee = prices.admin_fee;
   const totalToPay = basePrice + adminFee;
+  const serviceLabel =
+    data.mode === "homecare"
+      ? homecareSvc?.label ?? "Homecare Visit"
+      : "Konsultasi Online";
 
   async function handleConfirm() {
     if (!session) return;
@@ -97,6 +118,7 @@ export function StepPayment() {
           scheduled_at: scheduledAt,
           duration_min: 60,
           homecare_address: data.mode === "homecare" ? data.homecare_address : null,
+          homecare_service: data.mode === "homecare" ? (data.homecare_service || null) : null,
           amount: totalToPay,
           payment_type: "full",
         })
@@ -173,7 +195,7 @@ export function StepPayment() {
                   {data.mode === "homecare" ? <Home size={16} className="text-primary flex-shrink-0 mt-0.5" /> : <MapPin size={16} className="text-primary flex-shrink-0 mt-0.5" />}
                   <div>
                     <p className="text-xs text-text-secondary">Layanan</p>
-                    <p className="font-semibold">{data.mode === "homecare" ? "Homecare Visit" : "Konsultasi Online"}</p>
+                    <p className="font-semibold">{serviceLabel}</p>
                   </div>
                 </li>
               </ul>
@@ -214,7 +236,7 @@ export function StepPayment() {
             <div className="space-y-2 mb-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-text-secondary">
-                  Jasa {data.mode === "homecare" ? "Homecare" : "Psikolog"}
+                  {data.mode === "homecare" ? (homecareSvc?.short ?? "Homecare") : "Jasa Psikolog"}
                 </span>
                 <span className="font-semibold">Rp {basePrice.toLocaleString("id-ID")}</span>
               </div>

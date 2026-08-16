@@ -6,7 +6,17 @@ import type { Branch, Profile, UserRole } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 
-type PriceRow = { mode: "online" | "homecare" | "admin_fee"; price: number };
+type PriceRow = { mode: string; price: number };
+
+const PRICE_LABELS: Record<string, string> = {
+  online: "Konsultasi Online (Psikolog)",
+  homecare: "Homecare Visit (Umum, lama)",
+  admin_fee: "Biaya Admin",
+  homecare_bt: "Homecare BT — Behaviour Therapy Psikolog",
+  homecare_si: "Homecare SI — Sensory Integration",
+  homecare_ot: "Homecare OT — Occupational Therapy",
+  homecare_tw: "Homecare TW — Terapi Wicara",
+};
 type Psi = { id: string; title: string; photo_url: string | null };
 type Schedule = {
   id: string;
@@ -179,7 +189,7 @@ function PricingSection() {
           {prices.map((p) => (
             <div key={p.mode} className="bg-background rounded-2xl p-4 border border-black/5">
               <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-2">
-                {p.mode === "online" ? "Konsultasi Online" : p.mode === "homecare" ? "Homecare Visit" : "Biaya Admin"}
+                {PRICE_LABELS[p.mode] ?? p.mode}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-text-secondary">Rp</span>

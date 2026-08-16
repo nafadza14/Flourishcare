@@ -23,6 +23,7 @@ export type WizardData = {
   condition_notes: string;
 
   mode: "online" | "homecare";
+  homecare_service: "bt" | "si" | "ot" | "tw" | "";
   psychologist_id: string;
   psychologist_name: string;
   scheduled_date: string;
@@ -42,6 +43,7 @@ const DEFAULT: WizardData = {
   consultation_topic: "",
   condition_notes: "",
   mode: "online",
+  homecare_service: "",
   psychologist_id: "",
   psychologist_name: "",
   scheduled_date: "",

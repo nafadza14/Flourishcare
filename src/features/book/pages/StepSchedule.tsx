@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { fadeUp } from "@/lib/motion";
 import { useWizard } from "../wizardContext";
 import { Stepper } from "../Stepper";
+import { HOMECARE_SERVICES, type HomecareServiceKey } from "@/lib/homecarePrices";
 
 type Psi = {
   id: string;
@@ -200,6 +201,39 @@ export function StepSchedule() {
           </div>
         </div>
 
+        {/* Pilih Layanan Homecare — hanya kalau mode=homecare */}
+        {data.mode === "homecare" && (
+          <>
+            <p className="text-primary font-semibold text-xs uppercase tracking-wider mb-3">
+              Pilih Layanan Homecare
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+              {HOMECARE_SERVICES.map((svc) => (
+                <button
+                  key={svc.key}
+                  type="button"
+                  onClick={() => update({ homecare_service: svc.key as HomecareServiceKey })}
+                  className={`text-left rounded-3xl border p-4 transition-colors ${
+                    data.homecare_service === svc.key
+                      ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                      : "border-black/10 bg-white hover:border-primary/40"
+                  }`}
+                >
+                  <p className="font-heading font-bold text-sm">{svc.label}</p>
+                  <p className="text-xs text-primary mt-0.5">{svc.short}</p>
+                  <p className="text-xs text-text-secondary mt-2 leading-relaxed">{svc.desc}</p>
+                </button>
+              ))}
+            </div>
+            {!data.homecare_service && (
+              <p className="text-xs text-red bg-red/5 border border-red/10 rounded-xl px-3 py-2 mb-6">
+                Silakan pilih salah satu layanan homecare di atas untuk lanjut memilih psikolog & jadwal.
+              </p>
+            )}
+            <hr className="border-black/5 mb-6" />
+          </>
+        )}
+
         {/* Pilih Psikolog */}
         <p className="text-primary font-semibold text-xs uppercase tracking-wider mb-3">Pilih Psikolog</p>
         {loadingPsi ? (
@@ -352,7 +386,11 @@ export function StepSchedule() {
 
             <Button
               type="button"
-              disabled={!data.scheduled_date || !data.scheduled_time}
+              disabled={
+                !data.scheduled_date ||
+                !data.scheduled_time ||
+                (data.mode === "homecare" && !data.homecare_service)
+              }
               onClick={submit}
               size="lg"
               className="w-full rounded-full shadow-warm mt-6"
