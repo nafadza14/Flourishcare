@@ -159,11 +159,13 @@ export function StepSchedule() {
     update({ scheduled_date: `${y}-${m}-${day}`, scheduled_time: "" });
   }
 
-  // Tanggal bisa diklik selama masa depan & dalam bulan yang sama.
-  // Kalau psikolog tidak punya jadwal di hari itu, slot akan kosong dan user melihat pesan "Tidak ada slot".
+  // Booking hanya bisa H-1 (minimal 1 hari sebelumnya). Hari ini dan hari lampau tidak bisa dipilih.
   function isDayClickable(d: Date): boolean {
     if (d.getMonth() !== monthCursor.getMonth()) return false;
-    if (d < startOfToday()) return false;
+    const minDate = new Date();
+    minDate.setHours(0, 0, 0, 0);
+    minDate.setDate(minDate.getDate() + 1); // Besok
+    if (d < minDate) return false;
     return true;
   }
 
@@ -341,6 +343,9 @@ export function StepSchedule() {
             <div className="flex items-center gap-2 mt-4 text-xs text-text-secondary">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               Titik = hari yang biasanya ada jadwal
+            </div>
+            <div className="mt-2 text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-xl px-3 py-2">
+              ⏰ Booking minimal <span className="font-semibold">H-1</span> (hari ini tidak bisa dipesan).
             </div>
           </div>
 

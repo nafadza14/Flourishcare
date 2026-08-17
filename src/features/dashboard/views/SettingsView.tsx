@@ -91,7 +91,8 @@ export function SettingsView() {
       <CreateStaffSection branches={branches} onCreated={() => window.location.reload()} />
 
       {/* Pengguna */}
-      <section className="bg-white rounded-2xl border border-black/5 p-5">
+      <UsersSection users={users} onReload={() => window.location.reload()} />
+      <section className="hidden">
         <h3 className="font-heading font-bold flex items-center gap-2 mb-4">
           <UserCog size={18} className="text-primary" /> Pengguna & Role
         </h3>
@@ -1024,6 +1025,111 @@ function BookableStaffSection() {
             </div>
           </div>
         </div>
+      )}
+    </section>
+  );
+}
+
+// ============ Pengguna & Role (dengan tombol Hapus untuk super_admin) ============
+
+function UsersSection({ users, onReload }: { users: Profile[]; onReload: () => void }) {
+  const { role, session } = useAuth();
+  const isSuperAdmin = role === "super_admin";
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function handleDelete(u: Profile) {
+    if (u.id === session?.user.id) {
+      setMsg("Error: tidak bisa hapus akun sendiri.");
+      return;
+    }
+    if (!confirm(`HAPUS PERMANEN akun "${u.full_name}"?\n\nAkun auth + profile + jadwal semua terhapus. Aksi tidak bisa di-undo.`)) return;
+    setDeletingId(u.id);
+    setMsg(null);
+    const { data, error } = await supabase.functions.invoke("delete_staff_user", {
+      body: { user_id: u.id },
+    });
+    setDeletingId(null);
+    if (error) {
+      setMsg(`Error: ${error.message}`);
+      return;
+    }
+    if ((data as { error?: string })?.error) {
+      setMsg(`Error: ${(data as { error: string }).error}`);
+      return;
+    }
+    setMsg(`Akun ${u.full_name} berhasil dihapus.`);
+    onReload();
+  }
+
+  return (
+    <section className="bg-white rounded-2xl border border-black/5 p-5">
+      <h3 className="font-heading font-bold flex items-center gap-2 mb-1">
+        <UserCog size={18} className="text-primary" /> Pengguna & Role
+      </h3>
+      <p className="text-xs text-text-secondary mb-4">
+        Daftar semua akun yang punya profile. Super admin bisa hapus akun.
+      </p>
+
+      {users.length === 0 ? (
+        <EmptyState title="Belum ada pengguna" icon={UserCog} />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-left text-text-secondary">
+              <tr>
+                <th className="px-4 py-2 font-medium">Nama</th>
+                <th className="px-4 py-2 font-medium">Role</th>
+                <th className="px-4 py-2 font-medium">Status</th>
+                {isSuperAdmin && <th className="px-4 py-2 font-medium text-right">Aksi</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black/5">
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td className="px-4 py-3">
+                    {u.full_name}
+                    {u.id === session?.user.id && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary ml-2">Anda</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 capitalize">{u.role.replace("_", " ")}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                        u.is_active ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {u.is_active ? "Aktif" : "Nonaktif"}
+                    </span>
+                  </td>
+                  {isSuperAdmin && (
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleDelete(u)}
+                        disabled={deletingId === u.id || u.id === session?.user.id}
+                        className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border border-red/30 text-red hover:bg-red/10 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title={u.id === session?.user.id ? "Tidak bisa hapus akun sendiri" : "Hapus akun"}
+                      >
+                        {deletingId === u.id ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <>
+                            <Trash2 size={12} /> Hapus
+                          </>
+                        )}
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {msg && (
+        <p className={`text-xs mt-3 ${msg.startsWith("Error") ? "text-red" : "text-green-700"}`}>{msg}</p>
       )}
     </section>
   );
