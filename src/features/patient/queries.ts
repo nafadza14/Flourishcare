@@ -7,13 +7,16 @@ export type PatientBooking = {
   child_name: string;
   child_dob: string;
   mode: "online" | "homecare";
+  homecare_service: "bt" | "si" | "ot" | "tw" | null;
   psychologist_id: string;
+  psychologist_name?: string | null; // dari join
   scheduled_at: string;
   duration_min: number;
   amount: number;
   status: string;
   consultation_topic: string;
   homecare_address: string | null;
+  meeting_url: string | null;
   created_at: string;
 };
 
@@ -50,12 +53,20 @@ export type PatientChild = {
 };
 
 export async function fetchPatientBookings() {
+  // Join staff_profiles untuk dapat nama psikolog
   const { data, error } = await supabase
     .from("online_bookings")
-    .select("*")
+    .select("*, staff_profiles!online_bookings_psychologist_id_fkey(title)")
     .order("scheduled_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as PatientBooking[];
+  const rows = (data ?? []).map((r: Record<string, unknown>) => {
+    const sp = r.staff_profiles as { title?: string } | null;
+    return {
+      ...r,
+      psychologist_name: sp?.title ?? null,
+    };
+  });
+  return rows as PatientBooking[];
 }
 
 export async function fetchPatientPayments() {

@@ -23,6 +23,7 @@ type Row = {
   homecare_service: "bt" | "si" | "ot" | "tw" | null;
   meeting_url: string | null;
   created_at: string;
+  psychologist_name?: string | null;
 };
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -49,10 +50,14 @@ export function OnlineBookingsView() {
     setLoading(true);
     const { data } = await supabase
       .from("online_bookings")
-      .select("*")
+      .select("*, staff_profiles!online_bookings_psychologist_id_fkey(title)")
       .order("created_at", { ascending: false })
       .limit(100);
-    setRows((data as Row[]) ?? []);
+    const rows = (data ?? []).map((r: Record<string, unknown>) => {
+      const sp = r.staff_profiles as { title?: string } | null;
+      return { ...r, psychologist_name: sp?.title ?? null };
+    });
+    setRows(rows as Row[]);
     setLoading(false);
   }
 
@@ -137,6 +142,11 @@ export function OnlineBookingsView() {
                 <p className="text-xs text-text-secondary">
                   Orang tua: {b.parent_name} · {b.consultation_topic.replace(/_/g, " ")}
                 </p>
+                {b.psychologist_name && (
+                  <p className="text-xs text-primary mt-0.5 font-medium">
+                    Psikolog: {b.psychologist_name}
+                  </p>
+                )}
               </div>
               <p className="font-heading font-bold text-primary text-lg whitespace-nowrap">
                 {formatRupiah(Number(b.amount))}
