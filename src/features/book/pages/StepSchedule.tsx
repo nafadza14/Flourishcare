@@ -96,76 +96,52 @@ export function StepSchedule() {
   }, [data.psychologist_id, data.mode]);
 
   // Ambil slot ketika tanggal dipilih.
-  // Coba RPC dulu; kalau gagal / kosong, fallback ke generate client-side dari schedule.
+  // HANYA pakai RPC — no fallback, no client-side generation (bisa jadi sumber slot ganda).
+  // Race guard: pakai reqIdRef supaya response yang terlambat tidak overwrite state.
   useEffect(() => {
     if (!data.psychologist_id || !data.scheduled_date) {
       setSlots([]);
       return;
     }
+    let cancelled = false;
     (async () => {
       setLoadingSlots(true);
       try {
         const { data: rows, error } = await supabase.rpc("online_available_slots", {
           p_staff_id: data.psychologist_id,
           p_date: data.scheduled_date,
+          p_mode: data.mode,
         });
-        if (!error && rows && (rows as Slot[]).length > 0) {
-          setSlots(rows as Slot[]);
+        if (cancelled) return;
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error("[Slots] RPC error:", error);
+          setSlots([]);
           return;
         }
-        // Fallback: generate manual dari psychologist_schedules
-        const dow = new Date(data.scheduled_date + "T00:00:00").getDay();
-        const { data: schedRows } = await supabase
-          .from("psychologist_schedules")
-          .select("start_time,end_time,session_duration_min")
-          .eq("staff_id", data.psychologist_id)
-          .eq("day_of_week", dow)
-          .eq("is_active", true)
-          .eq("mode", data.mode);
-
-        const generated: Slot[] = [];
-        for (const s of schedRows ?? []) {
-          const dur = s.session_duration_min as number;
-          const [sh, sm] = (s.start_time as string).split(":").map(Number);
-          const [eh, em] = (s.end_time as string).split(":").map(Number);
-          const startMin = sh * 60 + sm;
-          const endMin = eh * 60 + em;
-          for (let t = startMin; t + dur <= endMin; t += dur) {
-            const h = Math.floor(t / 60);
-            const m = t % 60;
-            generated.push({
-              slot_time: `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`,
-              is_available: true,
-            });
-          }
-        }
-
-        // Filter slot yang sudah di-book (best-effort — hanya kelihatan booking milik user + admin, tapi cukup untuk UX)
-        const { data: bookedRows } = await supabase
-          .from("online_bookings")
-          .select("scheduled_at")
-          .eq("psychologist_id", data.psychologist_id)
-          .gte("scheduled_at", `${data.scheduled_date}T00:00:00`)
-          .lt("scheduled_at", `${data.scheduled_date}T23:59:59`)
-          .not("status", "in", "(cancelled,expired)");
-
-        const bookedTimes = new Set(
-          (bookedRows ?? []).map((b) => {
-            const d = new Date(b.scheduled_at as string);
-            return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:00`;
+        // Normalisasi slot_time — hindari edge case Supabase parsing (kadang "12:30:00", kadang "12:30")
+        const normalized: Slot[] = ((rows ?? []) as Array<{ slot_time: string | Date; is_available: boolean }>)
+          .map((r) => {
+            let t = typeof r.slot_time === "string" ? r.slot_time : "";
+            if (r.slot_time instanceof Date) {
+              t = `${String(r.slot_time.getUTCHours()).padStart(2, "0")}:${String(r.slot_time.getUTCMinutes()).padStart(2, "0")}:00`;
+            }
+            // Ambil hanya HH:MM:SS bagian awal (buang timezone kalau ada)
+            const match = t.match(/^(\d{2}:\d{2}(:\d{2})?)/);
+            const clean = match ? match[1] : t;
+            const hhmmss = clean.length === 5 ? `${clean}:00` : clean;
+            return { slot_time: hhmmss, is_available: r.is_available };
           })
-        );
-
-        setSlots(
-          generated.map((s) => ({
-            ...s,
-            is_available: !bookedTimes.has(s.slot_time),
-          }))
-        );
+          // Dedup by slot_time (kalau ada duplikat dari DB)
+          .filter((s, i, arr) => arr.findIndex((x) => x.slot_time === s.slot_time) === i);
+        // eslint-disable-next-line no-console
+        console.log("[Slots] Loaded", normalized.length, "slots for", data.mode, ":", normalized.map((s) => s.slot_time));
+        setSlots(normalized);
       } finally {
-        setLoadingSlots(false);
+        if (!cancelled) setLoadingSlots(false);
       }
     })();
+    return () => { cancelled = true; };
   }, [data.psychologist_id, data.scheduled_date, data.mode]);
 
   const monthMatrix = useMemo(() => buildMonthMatrix(monthCursor), [monthCursor]);
